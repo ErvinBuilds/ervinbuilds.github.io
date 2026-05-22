@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ErvinBuilds | AI & The Future of SWE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=JetBrains+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --black:   #070707;
+  --black2:  #0d0d0d;
+  --black3:  #141414;
+  --black4:  #1c1c1c;
+  --gold:    #C9A84C;
+  --gold-lt: #E4C06E;
+  --gold-dk: #7A6228;
+  --gold-gl: rgba(201,168,76,0.12);
+  --white:   #F4EFE6;
+  --dim:     #8A8378;
+  --border:  rgba(201,168,76,0.14);
+  --bh:      rgba(201,168,76,0.38);
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+
+body {
+  background: var(--black);
+  color: var(--white);
+  font-family: 'Syne', sans-serif;
+  overflow-x: hidden;
+}
+
+/* noise */
+body::before {
+  content:'';
+  position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.035'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:900;
+}
+
+/* gold grid */
+body::after {
+  content:'';
+  position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(201,168,76,.028) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(201,168,76,.028) 1px,transparent 1px);
+  background-size:64px 64px;
+  pointer-events:none;z-index:0;
+}
+
+/* ── NAV ─────────────────────────────── */
+nav {
+  position:fixed;top:0;left:0;right:0;z-index:800;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.1rem 3.5rem;
+  background:rgba(7,7,7,.88);
+  backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--border);
+}
+
+.logo {
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.4rem;font-weight:700;
+  color:var(--gold);text-decoration:none;letter-spacing:.04em;
+}
+.logo em{color:var(--white);font-style:normal;}
+
+.nav-links{display:flex;gap:2rem;list-style:none;}
+.nav-links a {
+  color:var(--dim);text-decoration:none;
+  font-size:.72rem;font-weight:600;
+  letter-spacing:.14em;text-transform:uppercase;
+  transition:color .2s;
+  cursor:pointer;
+}
+.nav-links a:hover,.nav-links a.active{color:var(--gold);}
+
+.nav-badge {
+  font-family:'JetBrains Mono',monospace;
+  font-size:.62rem;color:var(--gold-dk);
+  border:1px solid var(--gold-dk);
+  padding:.28rem .75rem;letter-spacing:.08em;
+}
+
+/* ── PAGE SYSTEM ─────────────────────── */
+.page{display:none;position:relative;z-index:1;}
+.page.active{display:block;}
+
+/* ── HERO ────────────────────────────── */
+#hero {
+  min-height:100vh;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;
+  padding:9rem 2rem 5rem;
+  position:relative;
+  overflow:hidden;
+}
+
+.hero-orb {
+  position:absolute;
+  width:700px;height:700px;border-radius:50%;
+  background:radial-gradient(circle,rgba(201,168,76,.07) 0%,transparent 68%);
+  pointer-events:none;
+  animation:orb 5s ease-in-out infinite;
+}
+
+@keyframes orb{0%,100%{transform:scale(1) translateY(0);}50%{transform:scale(1.06) translateY(-10px);}}
+
+.hero-label {
+  font-family:'JetBrains Mono',monospace;
+  font-size:.68rem;letter-spacing:.26em;color:var(--gold);
+  text-transform:uppercase;margin-bottom:1.6rem;
+  opacity:0;animation:up .9s ease .15s forwards;
+}
+
+.hero-h1 {
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(3.2rem,8vw,6.8rem);
+  font-weight:700;line-height:.98;
+  letter-spacing:-.02em;margin-bottom:1.4rem;
+  opacity:0;animation:up .9s ease .35s forwards;
+}
+.hero-h1 .g{color:var(--gold);}
+
+.hero-sub {
+  font-size:.92rem;color:var(--dim);
+  max-width:540px;line-height:1.75;
+  margin-bottom:2.8rem;
+  opacity:0;animation:up .9s ease .55s forwards;
+}
+
+.hero-author {
+  font-family:'JetBrains Mono',monospace;
+  font-size:.65rem;letter-spacing:.18em;color:var(--gold-dk);
+  text-transform:uppercase;margin-bottom:2.4rem;
+  opacity:0;animation:up .9s ease .7s forwards;
+}
+
+.hero-btns{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;
+  opacity:0;animation:up .9s ease .85s forwards;}
+
+.btn-g {
+  background:var(--gold);color:var(--black);
+  border:none;padding:.85rem 2rem;
+  font-family:'Syne',sans-serif;font-size:.75rem;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;
+  cursor:pointer;text-decoration:none;
+  clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%);
+  transition:all .22s;
+}
+.btn-g:hover{background:var(--gold-lt);transform:translateY(-2px);box-shadow:0 10px 30px rgba(201,168,76,.25);}
+
+.btn-o {
+  background:transparent;color:var(--gold);
+  border:1px solid var(--gold-dk);padding:.85rem 2rem;
+  font-family:'Syne',sans-serif;font-size:.75rem;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;
+  cursor:pointer;text-decoration:none;
+  transition:all .22s;
+}
+.btn-o:hover{border-color:var(--gold);background:var(--gold-gl);}
+
+.scroll-cue {
+  position:absolute;bottom:2.2rem;
+  display:flex;flex-direction:column;align-items:center;gap:.5rem;
+  opacity:0;animation:up .9s ease 1.2s forwards;
+}
+.scroll-cue span{font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.22em;color:var(--dim);text-transform:uppercase;}
+.scroll-line{width:1px;height:38px;background:linear-gradient(var(--gold),transparent);animation:sc 2s ease-in-out infinite;}
+@keyframes sc{0%,100%{opacity:1;}50%{opacity:.3;}}
+
+@keyframes up{from{opacity:0;transform:translateY(22px);}to{opacity:1;transform:translateY(0);}}
+
+/* ── SECTION SHELL ───────────────────── */
+.wrap{max-width:1300px;margin:0 auto;padding:7rem 3.5rem;}
+
+.sec-eyebrow {
+  font-family:'JetBrains Mono',monospace;
+  font-size:.65rem;letter-spacing:.22em;color:var(--gold);
+  text-transform:uppercase;margin-bottom:.6rem;
+}
+
+.sec-title {
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(2.2rem,5vw,3.4rem);font-weight:700;line-height:1;
+  margin-bottom:1rem;
+}
+
+.divider{width:100%;height:1px;background:var(--border);margin:2.5rem 0;}
+
+/* ── PULL QUOTE ──────────────────────── */
+.pull-quote {
+  border-left:3px solid var(--gold);
+  padding:1.5rem 0 1.5rem 2rem;
+  margin:3rem 0;
+}
+.pull-quote p {
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.55rem;font-weight:600;font-style:italic;
+  line-height:1.45;color:var(--white);
+}
+.pull-quote cite{
+  display:block;margin-top:.8rem;
+  font-family:'JetBrains Mono',monospace;
+  font-size:.62rem;letter-spacing:.14em;color:var(--gold);
+  text-transform:uppercase;font-style:normal;
+}
+
+/* ── BODY TEXT ───────────────────────── */
+.body-text {
+  font-size:.9rem;color:var(--dim);line-height:1.82;
+  max-width:760px;
+}
+.body-text + .body-text{margin-top:1.2rem;}
+.body-text strong{color:var(--white);font-weight:600;}
+
+/* ── TWO-COL ─────────────────────────── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start;}
+.three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem;}
+
+/* ── STAT CARDS ──────────────────────── */
+.stat-card {
+  background:var(--black2);border:1px solid var(--border);
+  padding:2rem 1.8rem;position:relative;overflow:hidden;
+  transition:border-color .25s,transform .25s;
+}
+.stat-card::before{
+  content:'';position:absolute;top:0;left:0;
+  width:3px;height:0;background:var(--gold);
+  transition:height .3s ease;
+}
+.stat-card:hover{border-color:var(--bh);transform:translateY(-3px);}
+.stat-card:hover::before{height:100%;}
+.stat-num {
+  font-family:'Cormorant Garamond',serif;
+  font-size:3.2rem;font-weight:700;color:var(--gold);
+  line-height:1;margin-bottom:.5rem;
+}
+.stat-label{font-size:.78rem;color:var(--dim);line-height:1.5;}
+.stat-note{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.1em;color:var(--gold-dk);margin-top:.8rem;text-transform:uppercase;}
+
+/* ── ROLE CHIPS ──────────────────────── */
+.chips{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1.6rem;}
+.chip {
+  font-family:'JetBrains Mono',monospace;
+  font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;
+  border:1px solid var(--border);color:var(--dim);
+  padding:.32rem .85rem;
+  transition:all .2s;cursor:default;
+}
+.chip:hover{border-color:var(--gold);color:var(--gold);background:var(--gold-gl);}
+.chip.highlight{border-color:var(--gold-dk);color:var(--gold);}
+
+/* ── SKILL BARS ──────────────────────── */
+.skill-row{margin-bottom:1.3rem;}
+.skill-top{display:flex;justify-content:space-between;margin-bottom:.45rem;}
+.skill-name{font-size:.8rem;font-weight:600;}
+.skill-pct{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--gold);}
+.skill-track{height:2px;background:var(--black4);position:relative;}
+.skill-fill{height:100%;background:linear-gradient(90deg,var(--gold-dk),var(--gold));width:0;transition:width 1.2s cubic-bezier(.4,0,.2,1);}
+
+/* ── TIMELINE ─────────────────────────── */
+.timeline{position:relative;padding-left:2rem;}
+.timeline::before{content:'';position:absolute;left:0;top:.5rem;bottom:.5rem;width:1px;background:var(--border);}
+.tl-item{position:relative;margin-bottom:2.5rem;}
+.tl-item::before{
+  content:'';position:absolute;left:-2rem;
+  top:.35rem;width:8px;height:8px;border-radius:50%;
+  border:1px solid var(--gold);background:var(--black);
+  transform:translateX(-3px);
+}
+.tl-year{font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.14em;color:var(--gold);text-transform:uppercase;margin-bottom:.4rem;}
+.tl-title{font-size:.95rem;font-weight:700;margin-bottom:.4rem;}
+.tl-body{font-size:.82rem;color:var(--dim);line-height:1.65;}
+
+/* ── FULL-WIDTH QUOTE BANNER ─────────── */
+.quote-banner {
+  background:var(--black2);
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  padding:5rem 3.5rem;
+  text-align:center;
+  position:relative;overflow:hidden;
+}
+.quote-banner::before{
+  content:'"';
+  font-family:'Cormorant Garamond',serif;
+  font-size:22rem;font-weight:700;
+  color:rgba(201,168,76,.04);
+  position:absolute;top:-4rem;left:2rem;line-height:1;
+  pointer-events:none;
+}
+.quote-banner blockquote{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(1.5rem,3.5vw,2.4rem);
+  font-weight:600;font-style:italic;
+  line-height:1.4;max-width:900px;margin:0 auto 1.4rem;
+  position:relative;z-index:1;
+}
+.quote-banner blockquote .g{color:var(--gold);}
+.quote-banner cite{font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.18em;color:var(--gold-dk);text-transform:uppercase;font-style:normal;}
+
+/* ── CHALLENGE CARDS ─────────────────── */
+.challenge-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.2rem;margin-top:2rem;}
+.c-card{background:var(--black2);border:1px solid var(--border);padding:1.8rem;transition:all .28s;position:relative;overflow:hidden;}
+.c-card::after{content:'';position:absolute;bottom:0;right:0;width:70px;height:70px;background:radial-gradient(circle at bottom right,rgba(201,168,76,.07),transparent);pointer-events:none;}
+.c-card:hover{border-color:var(--bh);transform:translateY(-3px);box-shadow:0 12px 36px rgba(0,0,0,.45);}
+.c-card-n{font-family:'Cormorant Garamond',serif;font-size:2.8rem;font-weight:700;color:rgba(201,168,76,.12);line-height:1;margin-bottom:.5rem;}
+.c-card-t{font-size:.95rem;font-weight:700;margin-bottom:.6rem;}
+.c-card-b{font-size:.8rem;color:var(--dim);line-height:1.65;}
+
+/* ── CREDITS ──────────────────────────── */
+.credits-grid{display:grid;gap:1px;background:var(--border);}
+.credit-row{background:var(--black);display:grid;grid-template-columns:1fr 2fr auto;gap:2rem;align-items:start;padding:1.8rem 0;border-bottom:1px solid var(--border);transition:background .2s;}
+.credit-row:hover{background:var(--black2);}
+.credit-num{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:700;color:rgba(201,168,76,.15);line-height:1;}
+.credit-author{font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.1em;color:var(--gold);text-transform:uppercase;margin-bottom:.35rem;}
+.credit-title{font-size:.9rem;font-weight:700;margin-bottom:.4rem;line-height:1.3;}
+.credit-pub{font-size:.78rem;color:var(--dim);}
+.credit-date{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--gold-dk);letter-spacing:.08em;white-space:nowrap;margin-top:.2rem;}
+.credit-link{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--gold-dk);text-decoration:none;border:1px solid var(--gold-dk);padding:.3rem .7rem;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;transition:all .2s;align-self:center;}
+.credit-link:hover{color:var(--gold);border-color:var(--gold);background:var(--gold-gl);}
+
+.credits-note{font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.12em;color:var(--dim);text-transform:uppercase;margin-top:2.5rem;line-height:1.7;}
+
+/* ── FOOTER ───────────────────────────── */
+footer{
+  position:relative;z-index:1;
+  border-top:1px solid var(--border);
+  padding:2.5rem 3.5rem;
+  display:flex;align-items:center;justify-content:space-between;
+  margin-top:2rem;
+}
+.footer-logo{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:700;color:var(--gold);}
+.footer-logo em{color:var(--dim);font-style:normal;}
+.footer-note{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.12em;color:var(--dim);text-transform:uppercase;}
+.footer-link{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--gold-dk);text-decoration:none;letter-spacing:.08em;transition:color .2s;}
+.footer-link:hover{color:var(--gold);}
+
+/* ── RESPONSIVE ──────────────────────── */
+@media(max-width:900px){
+  nav{padding:1rem 1.5rem;}
+  .nav-badge{display:none;}
+  .wrap{padding:5rem 1.5rem;}
+  .two-col{grid-template-columns:1fr;gap:2.5rem;}
+  .three-col{grid-template-columns:1fr;}
+  .credit-row{grid-template-columns:1fr;gap:.8rem;padding:1.5rem 0;}
+  .quote-banner{padding:3.5rem 1.5rem;}
+  footer{flex-direction:column;gap:1rem;text-align:center;padding:2rem 1.5rem;}
+}
+
+/* ── PAGE TRANSITIONS ────────────────── */
+.page{animation:pageIn .45s ease forwards;}
+@keyframes pageIn{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo" onclick="show('home');return false;">Ervin<em>Builds</em></a>
+  <ul class="nav-links">
+    <li><a onclick="show('home')" id="nav-home" class="active">Home</a></li>
+    <li><a onclick="show('essay')" id="nav-essay">The Essay</a></li>
+    <li><a onclick="show('insights')" id="nav-insights">Insights</a></li>
+    <li><a onclick="show('credits')" id="nav-credits">Credits</a></li>
+  </ul>
+  <div style="display:flex;align-items:center;gap:1rem;">
+    <a href="https://ervinbuilds.github.io" target="_blank" class="btn-o" style="font-size:.62rem;padding:.38rem 1rem;letter-spacing:.1em;">← Portfolio</a>
+    <span class="nav-badge">ECU · English 2201</span>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════
+     PAGE: HOME
+══════════════════════════════════════ -->
+<div class="page active" id="page-home">
+  <section id="hero">
+    <div class="hero-orb"></div>
+
+    <p class="hero-label">// ervinbuilds · english 2201 · fall 2025</p>
+
+    <h1 class="hero-h1">
+      AI & The<br>Future of <span class="g">Software</span><br>Engineering
+    </h1>
+
+    <p class="hero-sub">
+      A research-driven exploration of how artificial intelligence is reshaping software engineering careers — the risks, the opportunities, and what it means to be a developer in the age of AI.
+    </p>
+
+    <p class="hero-author">Antonio Ervin &nbsp;·&nbsp; Mr. Joshua Gardner &nbsp;·&nbsp; November 2025</p>
+
+    <div class="hero-btns">
+      <button class="btn-g" onclick="show('essay')">Read the Essay</button>
+      <button class="btn-o" onclick="show('insights')">Key Insights</button>
+    </div>
+
+    <div class="scroll-cue">
+      <span>Scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- SUMMARY STATS -->
+  <div class="wrap" style="padding-top:3rem;padding-bottom:5rem;">
+    <div class="sec-eyebrow">// by the numbers</div>
+    <h2 class="sec-title">The Research at a Glance</h2>
+    <div class="divider"></div>
+
+    <div class="three-col">
+      <div class="stat-card">
+        <div class="stat-num">17.9%</div>
+        <div class="stat-label">Projected growth in software developer jobs from 2023–2033 — well above the national average for all occupations.</div>
+        <div class="stat-note">Bureau of Labor Statistics</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">18%</div>
+        <div class="stat-label">The "AI premium" — how much more engineers with AI-centric skills earn compared to peers without them.</div>
+        <div class="stat-note">Developer Tech / Industry Data</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">$632B</div>
+        <div class="stat-label">Projected global AI software market value by 2028 — growing at roughly 29% annually.</div>
+        <div class="stat-note">TechPilot, John Daniel</div>
+      </div>
+    </div>
+
+    <div style="margin-top:3rem;" class="pull-quote">
+      <p>"AI is not simply replacing engineers — it is augmenting them. Engineers who embrace these tools can deliver higher-quality software faster, positioning themselves as indispensable contributors."</p>
+      <cite>Antonio Ervin — Dear Future Software Engineers (2025)</cite>
+    </div>
+
+    <div style="margin-top:2.5rem;" class="two-col">
+      <div>
+        <p class="body-text">There is a lot of speculation on whether or not AI is taking over software engineering jobs. The truth lies in a nuanced middle ground: <strong>AI is a transformative force that demands adaptability, creativity, and resilience</strong> — not panic.</p>
+        <p class="body-text" style="margin-top:1.2rem;">A Stanford study found a 13% relative decline in employment for early-aged software engineers in AI-exposed roles. But throughout the decline, positives emerged — AI is generating entirely new job categories and boosting productivity for engineers who engage with it.</p>
+        <div style="margin-top:1.8rem;">
+          <button class="btn-g" onclick="show('essay')">Read Full Essay →</button>
+        </div>
+      </div>
+      <div>
+        <p class="sec-eyebrow" style="margin-bottom:1rem;">New roles created by AI</p>
+        <div class="chips">
+          <span class="chip highlight">ML / AI Engineer</span>
+          <span class="chip highlight">Prompt Engineer</span>
+          <span class="chip highlight">AI Architect</span>
+          <span class="chip">Ethics & Compliance Lead</span>
+          <span class="chip">Domain Specialist</span>
+          <span class="chip">AI Manager</span>
+          <span class="chip">Cloud / Cybersecurity</span>
+          <span class="chip">Data Scientist</span>
+          <span class="chip">IoT / Robotics Systems</span>
+          <span class="chip">AI Governance</span>
+        </div>
+        <p class="body-text" style="margin-top:1.5rem;font-size:.78rem;">These roles didn't exist a decade ago. They represent the frontier of where software engineering is headed — and where the highest earning potential now lives.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     PAGE: ESSAY
+══════════════════════════════════════ -->
+<div class="page" id="page-essay">
+  <div class="wrap" style="padding-top:9rem;">
+    <div class="sec-eyebrow">// persuasive letter · english 2201</div>
+    <h1 class="sec-title">Dear Future Software Engineers,</h1>
+    <p style="font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.14em;color:var(--gold-dk);text-transform:uppercase;margin:.6rem 0 2.5rem;">Antonio Ervin &nbsp;·&nbsp; Mr. Joshua Gardner &nbsp;·&nbsp; 21 November 2025</p>
+    <div class="divider"></div>
+  </div>
+
+  <!-- OPENING -->
+  <div class="wrap" style="padding-top:1rem;padding-bottom:3rem;">
+    <p class="body-text">Artificial intelligence (AI) is reshaping the landscape of software engineering in ways that are both daunting and promising. As you prepare to enter this field, you may hear conflicting narratives: some warn of job losses, while others emphasize new opportunities. The truth lies in a nuanced middle ground. <strong>AI is not simply a threat — it is a transformative force that requires adaptability, creativity, and resilience.</strong> This letter aims to persuade you that despite the challenges, software engineering remains a vital and rewarding career path.</p>
+  </div>
+
+  <!-- THREAT SECTION -->
+  <div class="quote-banner">
+    <blockquote>"A study was conducted at Stanford where there was a <span class="g">13 percent relative decline</span> in employment for early-aged software engineers in AI-exposed jobs."</blockquote>
+    <cite>Sundeep Teki · sundeepteki.org · August 2025</cite>
+  </div>
+
+  <div class="wrap" style="padding-top:3.5rem;padding-bottom:3.5rem;">
+    <div class="two-col">
+      <div>
+        <div class="sec-eyebrow">// the challenge</div>
+        <h2 class="sec-title">The Disruption Is Real</h2>
+        <div class="divider"></div>
+        <p class="body-text">AI has already begun to automate many tasks traditionally performed by junior engineers. <strong>Generative AI excels at codified knowledge</strong> — boilerplate coding, standard algorithms, and repetitive tasks — areas where new graduates once gained their footing.</p>
+        <p class="body-text" style="margin-top:1.2rem;">This shift has disrupted the traditional apprenticeship model, leaving fewer opportunities for juniors to build tacit knowledge through hands-on practice. Industry leaders acknowledge this disruption openly.</p>
+        <p class="body-text" style="margin-top:1.2rem;">OpenAI's agentic software engineer (A-SWE) can generate applications, perform bug testing, and write documentation — tasks that once formed the foundation of entry-level work. As a result, companies may hire fewer junior developers, creating anxiety about the profession's future.</p>
+      </div>
+      <div>
+        <div class="sec-eyebrow" style="margin-bottom:1.2rem;">// what AI is replacing</div>
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-year">Immediate Impact</div>
+            <div class="tl-title">Boilerplate Coding</div>
+            <div class="tl-body">Repetitive, formulaic code that junior engineers once wrote to build experience is now auto-generated by tools like GitHub Copilot and ChatGPT.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-year">Near-Term Impact</div>
+            <div class="tl-title">Standard Algorithms & Bug Fixes</div>
+            <div class="tl-body">AI agents can now locate and patch common bugs, write unit tests, and implement standard sorting and searching routines faster than a human junior developer.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-year">Emerging Impact</div>
+            <div class="tl-title">Documentation & DevOps Tasks</div>
+            <div class="tl-body">Agentic AI systems are moving into planning, execution, and adaptation of tasks originally done by humans — shifting engineers from authoring to overseeing.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPPORTUNITY SECTION -->
+  <div class="quote-banner">
+    <blockquote>"The U.S. Bureau of Labor Statistics projects a <span class="g">17.9% growth</span> in software developer employment between 2023 and 2033 — far above the average for all occupations."</blockquote>
+    <cite>John Daniel · TechPilot · November 2024</cite>
+  </div>
+
+  <div class="wrap" style="padding-top:3.5rem;padding-bottom:3.5rem;">
+    <div class="two-col">
+      <div>
+        <div class="sec-eyebrow">// the opportunity</div>
+        <h2 class="sec-title">AI Is Augmenting Engineers</h2>
+        <div class="divider"></div>
+        <p class="body-text">Yet, AI is not simply replacing engineers — it is augmenting them. Generative AI tools streamline coding, testing, and documentation, allowing developers to focus on <strong>higher-value tasks</strong>. The growth projections reflect increasing demand for engineers who can integrate AI into workflows, design complex systems, and ensure reliability.</p>
+        <p class="body-text" style="margin-top:1.2rem;">AI also enhances productivity by automating repetitive tasks, improving bug detection, and supporting DevOps efficiency. Rather than eliminating jobs, AI is creating <strong>new roles in machine learning, data science, cybersecurity, and AI architecture.</strong></p>
+        <p class="body-text" style="margin-top:1.2rem;">Google has already reported that <strong>25% of internal code is written by AI</strong> — and those engineers aren't out of a job. They're reviewing, orchestrating, and directing AI output toward business goals. This is the new engineering role.</p>
+      </div>
+      <div>
+        <div class="sec-eyebrow" style="margin-bottom:1.2rem;">// skills the market demands</div>
+        <div id="skillBars">
+          <div class="skill-row"><div class="skill-top"><span class="skill-name">AI/ML Engineering</span><span class="skill-pct">94%</span></div><div class="skill-track"><div class="skill-fill" data-w="94"></div></div></div>
+          <div class="skill-row"><div class="skill-top"><span class="skill-name">Cloud & Cybersecurity</span><span class="skill-pct">90%</span></div><div class="skill-track"><div class="skill-fill" data-w="90"></div></div></div>
+          <div class="skill-row"><div class="skill-top"><span class="skill-name">Backend / Distributed Systems</span><span class="skill-pct">87%</span></div><div class="skill-track"><div class="skill-fill" data-w="87"></div></div></div>
+          <div class="skill-row"><div class="skill-top"><span class="skill-name">Prompt Engineering</span><span class="skill-pct">82%</span></div><div class="skill-track"><div class="skill-fill" data-w="82"></div></div></div>
+          <div class="skill-row"><div class="skill-top"><span class="skill-name">System Architecture</span><span class="skill-pct">80%</span></div><div class="skill-track"><div class="skill-fill" data-w="80"></div></div></div>
+          <div class="skill-row"><div class="skill-top"><span class="skill-name">Critical Thinking & Adaptability</span><span class="skill-pct">78%</span></div><div class="skill-track"><div class="skill-fill" data-w="78"></div></div></div>
+        </div>
+        <p style="font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.1em;color:var(--gold-dk);margin-top:1rem;text-transform:uppercase;">Relative demand growth — AI-era software engineering roles</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CLOSING -->
+  <div class="wrap" style="padding-top:1rem;padding-bottom:5rem;">
+    <div class="pull-quote">
+      <p>"Despite the challenges, software engineering remains one of the most dynamic and impactful careers. AI cannot replicate human creativity, contextual understanding, or ethical judgment."</p>
+      <cite>Antonio Ervin — Dear Future Software Engineers (2025)</cite>
+    </div>
+
+    <p class="body-text">The problem is real: AI is reshaping entry-level opportunities and automating routine tasks. But the solution is equally clear — <strong>adaptability, continuous learning, and embracing AI as a partner.</strong> Software engineering is not disappearing. It is evolving.</p>
+    <p class="body-text" style="margin-top:1.2rem;">By joining the field, you will not only secure a rewarding career but also play a pivotal role in shaping the future of technology. Future software engineers shouldn't be worried about AI exposure since there are so many opportunities where jobs could be open from AI itself. Yes, there is still risk — but in the grand scheme of the problem, there is still hope.</p>
+
+    <p style="margin-top:2.8rem;font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-style:italic;color:var(--dim);">Sincerely,</p>
+    <p style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:700;color:var(--gold);margin-top:.3rem;">A Fellow Advocate for Your Future,<br>Antonio Ervin</p>
+
+    <div style="margin-top:2.5rem;display:flex;gap:1rem;">
+      <button class="btn-g" onclick="show('insights')">See Key Insights →</button>
+      <button class="btn-o" onclick="show('credits')">View Sources</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     PAGE: INSIGHTS
+══════════════════════════════════════ -->
+<div class="page" id="page-insights">
+  <div class="wrap" style="padding-top:9rem;">
+    <div class="sec-eyebrow">// research synthesis</div>
+    <h1 class="sec-title">Key Insights</h1>
+    <p class="body-text">What six research sources agree on — and what it means for the next generation of software engineers.</p>
+    <div class="divider"></div>
+  </div>
+
+  <!-- CHALLENGE CARDS -->
+  <div class="wrap" style="padding-top:1rem;padding-bottom:3rem;">
+    <div class="sec-eyebrow">// what's changing</div>
+    <h2 class="sec-title" style="font-size:2rem;margin-bottom:.5rem;">The Disruptions</h2>
+    <div class="challenge-grid">
+      <div class="c-card">
+        <div class="c-card-n">01</div>
+        <div class="c-card-t">Entry-Level Role Compression</div>
+        <div class="c-card-b">A Stanford study found a 13% relative decline in employment for early-career engineers in AI-exposed positions since 2022. Generative AI handles the boilerplate work that once gave juniors their foundation. The apprenticeship model is being disrupted.</div>
+      </div>
+      <div class="c-card">
+        <div class="c-card-n">02</div>
+        <div class="c-card-t">The Autonomous Agent Shift</div>
+        <div class="c-card-b">Companies are moving from manual completion to autonomous AI agents that can plan, execute, and adapt tasks — including debugging and interacting with compilers. This shifts engineer roles from coding to goal-setting and system oversight.</div>
+      </div>
+      <div class="c-card">
+        <div class="c-card-n">03</div>
+        <div class="c-card-t">Technical Debt from AI Code</div>
+        <div class="c-card-b">AI agents can drastically reduce coding time, especially for junior developers — but risk adding technical debt if output isn't reviewed. Engineers may spend more time monitoring and correcting AI mistakes than innovating.</div>
+      </div>
+      <div class="c-card">
+        <div class="c-card-n">04</div>
+        <div class="c-card-t">Tacit Knowledge Gap</div>
+        <div class="c-card-b">Senior engineers benefit most from AI because productivity gains compound on top of tacit knowledge they've already built. Juniors lose the hands-on experience that once built that foundation — creating a growing skills gap.</div>
+      </div>
+      <div class="c-card">
+        <div class="c-card-n">05</div>
+        <div class="c-card-t">Hiring Practice Disruption</div>
+        <div class="c-card-b">Traditional whiteboard coding interviews no longer accurately measure engineer competence in an AI-assisted world. Companies must evolve assessments to measure how candidates collaborate with AI tools, not just whether they can write algorithms from scratch.</div>
+      </div>
+      <div class="c-card">
+        <div class="c-card-n">06</div>
+        <div class="c-card-t">Domain Inequality</div>
+        <div class="c-card-b">Not all software engineering roles are affected equally. Frontend and boilerplate-heavy roles face more immediate pressure, while backend systems, AI/ML, cybersecurity, and cloud architecture roles are growing and largely human-dependent.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="quote-banner">
+    <blockquote>"<span class="g">Human contextual awareness and human creativity</span> will remain indispensable. Collaboration between AI and developers will drive innovation across industries."</blockquote>
+    <cite>GeeksforGeeks · July 2025</cite>
+  </div>
+
+  <!-- OPPORTUNITIES -->
+  <div class="wrap" style="padding-top:3.5rem;padding-bottom:3rem;">
+    <div class="sec-eyebrow">// what's growing</div>
+    <h2 class="sec-title" style="font-size:2rem;margin-bottom:.5rem;">The Opportunities</h2>
+    <div class="challenge-grid">
+      <div class="c-card">
+        <div class="c-card-n">01</div>
+        <div class="c-card-t">Explosive Job Growth</div>
+        <div class="c-card-b">17.9% projected growth in software developer employment (2023–2033) — far above the national average. AI is expanding the total scope of software engineering rather than replacing it wholesale. The field is getting bigger, not smaller.</div>
+      </div>
+      <div class="c-card">
+        <div class="c-card-n">02</div>
+        <div class="c-card-t">The AI Salary Premium</div>
+        <div class="c-card-b">Engineers with AI-centric skills earn nearly 18% more than peers without them. As AI tools become standard, the gap between engineers who can use them expertly and those who can't will widen — creating a significant income premium for early adopters.</div>
+      </div>
+      <div class="c-card">
+        <div class="c-card-n">03</div>
+        <div class="c-card-t">New Career Tracks</div>
+        <div class="c-card-b">AI is creating entirely new roles: ML engineers, AI architects, ethics-compliance leaders, domain specialists, and AI managers. These positions require the human judgment, creativity, and contextual awareness that AI cannot replicate.</div>
+      </div>
+      <div class="c-card">
+        <div class="c-card-n">04</div>
+        <div class="c-card-t">Exploding AI Software Market</div>
+        <div class="c-card-b">Global AI software is projected to reach $632 billion by 2028 — growing at ~29% annually. This isn't a shrinking industry. The engineers who position themselves at the frontier of this market will have extraordinary career leverage.</div>
+      </div>
+      <div class="c-card">
+        <div class="c-card-n">05</div>
+        <div class="c-card-t">The Irreplaceable Human Layer</div>
+        <div class="c-card-b">AI cannot replicate complex stakeholder dialogue, ethical judgment, creative problem-solving, or the contextual insight required to align software with business goals. Engineers who cultivate these meta-skills become increasingly valuable as AI handles routine work.</div>
+      </div>
+      <div class="c-card">
+        <div class="c-card-n">06</div>
+        <div class="c-card-t">Cybersecurity & Cloud Growth</div>
+        <div class="c-card-b">Cybersecurity, blockchain, cloud infrastructure, and IoT/industrial systems are among the fastest-growing engineering domains — all areas where AI augments human capability rather than replacing it, requiring deep domain expertise and human oversight.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WHAT TO DO -->
+  <div class="wrap" style="padding-top:1rem;padding-bottom:5rem;">
+    <div class="sec-eyebrow">// the playbook</div>
+    <h2 class="sec-title" style="font-size:2rem;margin-bottom:2rem;">What Future Engineers Should Do</h2>
+    <div class="two-col">
+      <div>
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-year">Right Now</div>
+            <div class="tl-title">Learn Prompt Engineering & AI Debugging</div>
+            <div class="tl-body">The most valuable near-term skill is knowing how to get high-quality output from AI tools and how to critically evaluate what they produce. This is already differentiating engineers in the job market.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-year">Near Term</div>
+            <div class="tl-title">Specialize in Backend, Cloud, or ML</div>
+            <div class="tl-body">Backend development, distributed systems, cloud infrastructure, and machine learning are in high demand and largely insulated from AI automation. Depth in these areas is a strong career foundation.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-year">Long Term</div>
+            <div class="tl-title">Cultivate Meta-Skills</div>
+            <div class="tl-body">Critical thinking, communication, architectural reasoning, and business acumen — the ability to align software with strategic goals — are skills AI cannot replicate and that grow more valuable as automation increases.</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="pull-quote" style="margin-top:0;">
+          <p>"Those who treat AI as a collaborator rather than a competitor will thrive."</p>
+          <cite>Sundeep Teki · August 2025</cite>
+        </div>
+        <p class="body-text" style="margin-top:1.5rem;">The consensus across all six research sources is clear: <strong>the question is not whether AI will change software engineering — it's whether you will adapt.</strong></p>
+        <p class="body-text" style="margin-top:1rem;">Developers who embrace AI are likely to thrive in the dynamic job market. Past examples show that while some roles decline sharply, others grow or remain stable. The engineers who position themselves on the right side of this shift will define the next era of the profession.</p>
+        <div style="margin-top:2rem;">
+          <button class="btn-g" onclick="show('credits')">View All Sources →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     PAGE: CREDITS
+══════════════════════════════════════ -->
+<div class="page" id="page-credits">
+  <div class="wrap" style="padding-top:9rem;">
+    <div class="sec-eyebrow">// works cited · MLA format</div>
+    <h1 class="sec-title">Sources & Credits</h1>
+    <p class="body-text" style="max-width:620px;">Every claim in this research is grounded in published sources. Below are the six works that informed this project — properly cited and linked for further reading.</p>
+    <div class="divider"></div>
+  </div>
+
+  <div class="wrap" style="padding-top:1rem;padding-bottom:5rem;">
+
+    <div class="credits-grid">
+
+      <!-- 1 -->
+      <div class="credit-row">
+        <div>
+          <div class="credit-num">01</div>
+          <div class="credit-author">Teki, Sundeep</div>
+        </div>
+        <div>
+          <div class="credit-title">"Impact of AI on the 2025 Software Engineering Job Market"</div>
+          <div class="credit-pub"><em>Sundeep Teki</em> — sundeepteki.org</div>
+          <div class="credit-date">29 August 2025</div>
+          <p class="body-text" style="font-size:.75rem;margin-top:.7rem;">Key contribution: Stanford study data showing a 13% relative decline in employment for early-career engineers in AI-exposed roles; insight that those who treat AI as a collaborator rather than a competitor will thrive; adaptability as the defining meta-skill of the era.</p>
+        </div>
+        <a class="credit-link" href="https://www.sundeepteki.org/advice/impact-of-ai-on-the-2025-software-engineering-job-market" target="_blank">Visit ↗</a>
+      </div>
+
+      <!-- 2 -->
+      <div class="credit-row">
+        <div>
+          <div class="credit-num">02</div>
+          <div class="credit-author">Daniel, John</div>
+        </div>
+        <div>
+          <div class="credit-title">"AI and the Future of Software Engineering: 2025 and Beyond"</div>
+          <div class="credit-pub"><em>TechPilot</em> — techpilot.ai</div>
+          <div class="credit-date">28 November 2024</div>
+          <p class="body-text" style="font-size:.75rem;margin-top:.7rem;">Key contribution: BLS projection of 17.9% job growth for software developers (2023–2033); new AI-created roles including architects, domain specialists, ethics-compliance leaders, and AI managers; global AI software market projected at $632B by 2028 (~29% annual growth); Google's 25% AI-written code statistic.</p>
+        </div>
+        <a class="credit-link" href="https://techpilot.ai/ai-and-the-future-of-software-engineering-2025/" target="_blank">Visit ↗</a>
+      </div>
+
+      <!-- 3 -->
+      <div class="credit-row">
+        <div>
+          <div class="credit-num">03</div>
+          <div class="credit-author">Daws, Ryan</div>
+        </div>
+        <div>
+          <div class="credit-title">"AI and Its Impact on Software Development Jobs"</div>
+          <div class="credit-pub"><em>Developer Tech</em> — developer-tech.com</div>
+          <div class="credit-date">25 February 2025</div>
+          <p class="body-text" style="font-size:.75rem;margin-top:.7rem;">Key contribution: Analysis of how generative AI is reshaping specific developer roles differently; database administrator and architect employment growth projections (8.2% and 10.8%); the 18% AI skills salary premium; framing of AI as an ally that improves creativity and productivity.</p>
+        </div>
+        <a class="credit-link" href="https://www.developer-tech.com/news/ai-impact-on-software-development-jobs/" target="_blank">Visit ↗</a>
+      </div>
+
+      <!-- 4 -->
+      <div class="credit-row">
+        <div>
+          <div class="credit-num">04</div>
+          <div class="credit-author">McKendrick, Joe</div>
+        </div>
+        <div>
+          <div class="credit-title">"Will AI Replace Software Engineers? It Depends on Who You Ask"</div>
+          <div class="credit-pub"><em>ZDNet</em> — zdnet.com</div>
+          <div class="credit-date">21 April 2025</div>
+          <p class="body-text" style="font-size:.75rem;margin-top:.7rem;">Key contribution: Analysis of OpenAI's agentic software engineer (A-SWE) and its ability to generate apps, perform bug testing, and write documentation; the risk of technical debt from AI-generated code without human review; insight that software engineers may evolve into editors and reviewers of AI output rather than authors of every line.</p>
+        </div>
+        <a class="credit-link" href="https://www.zdnet.com/article/will-ai-replace-software-engineers-it-depends-on-who-you-ask/" target="_blank">Visit ↗</a>
+      </div>
+
+      <!-- 5 -->
+      <div class="credit-row">
+        <div>
+          <div class="credit-num">05</div>
+          <div class="credit-author">Fahey, Ethan</div>
+        </div>
+        <div>
+          <div class="credit-title">"Will AI Replace Software Engineers? What the Future Looks Like"</div>
+          <div class="credit-pub"><em>Fonzi AI Blog</em> — fonzi.ai</div>
+          <div class="credit-date">15 July 2025</div>
+          <p class="body-text" style="font-size:.75rem;margin-top:.7rem;">Key contribution: Detailed breakdown of the skills required for AI-era software engineering — technical skills (ML, data science, PyTorch/TensorFlow), soft skills (adaptability, critical thinking, communication, teamwork), and business acumen; growth in ML engineers, AI-focused developers, and data scientists as the future job market.</p>
+        </div>
+        <a class="credit-link" href="https://fonzi.ai/blog/will-ai-replace-software-engineers" target="_blank">Visit ↗</a>
+      </div>
+
+      <!-- 6 -->
+      <div class="credit-row">
+        <div>
+          <div class="credit-num">06</div>
+          <div class="credit-author">GeeksforGeeks</div>
+        </div>
+        <div>
+          <div class="credit-title">"Will AI Replace Software Engineers"</div>
+          <div class="credit-pub"><em>GeeksforGeeks</em> — geeksforgeeks.org</div>
+          <div class="credit-date">23 July 2025</div>
+          <p class="body-text" style="font-size:.75rem;margin-top:.7rem;">Key contribution: The blended model framework — AI augmenting rather than replacing human engineers; emphasis that human contextual awareness and creativity remain indispensable; AI's limitations in domain-specific knowledge and novel problem-solving; AI as a cost-reduction tool for companies through streamlined workflows and boilerplate code generation.</p>
+        </div>
+        <a class="credit-link" href="https://www.geeksforgeeks.org/blogs/will-ai-replace-software-engineers/" target="_blank">Visit ↗</a>
+      </div>
+
+    </div>
+
+    <div class="credits-note">
+      <p>All sources accessed and cited in accordance with MLA 9th edition formatting guidelines.</p>
+      <p style="margin-top:.4rem;">Research conducted for English 2201 &nbsp;·&nbsp; Mr. Joshua Gardner &nbsp;·&nbsp; East Carolina University &nbsp;·&nbsp; Fall 2025</p>
+      <p style="margin-top:.4rem;">Compiled and presented by Antonio Ervin &nbsp;·&nbsp; ervinbuilds.github.io</p>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- FOOTER -->
+<footer style="position:relative;z-index:1;">
+  <div class="footer-logo">Ervin<em>Builds</em></div>
+  <span class="footer-note">Antonio Ervin · ECU · English 2201 · Fall 2025</span>
+  <a href="https://ervinbuilds.github.io" class="footer-link" target="_blank">ervinbuilds.github.io ↗</a>
+</footer>
+
+
+<script>
+// ── PAGE NAV ──
+function show(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.getElementById('nav-' + id).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (id === 'essay') animateBars();
+}
+
+// ── SKILL BARS ──
+let barsAnimated = false;
+function animateBars() {
+  if (barsAnimated) return;
+  barsAnimated = true;
+  setTimeout(() => {
+    document.querySelectorAll('.skill-fill').forEach(bar => {
+      bar.style.width = bar.dataset.w + '%';
+    });
+  }, 200);
+}
+
+// ── COUNTER ANIM ──
+function animateCounters() {
+  document.querySelectorAll('[data-count]').forEach(el => {
+    const target = parseFloat(el.dataset.count);
+    const isFloat = el.dataset.count.includes('.');
+    let current = 0;
+    const steps = 40;
+    const increment = target / steps;
+    const timer = setInterval(() => {
+      current = Math.min(current + increment, target);
+      el.textContent = isFloat ? current.toFixed(1) : Math.round(current);
+      if (current >= target) clearInterval(timer);
+    }, 35);
+  });
+}
+
+// observe hero stats
+const obs = new IntersectionObserver(entries => {
+  if (entries[0].isIntersecting) { animateCounters(); obs.disconnect(); }
+}, { threshold: .4 });
+const statsEl = document.querySelector('.three-col');
+if (statsEl) obs.observe(statsEl);
+
+// ── PARALLAX HERO ORB ──
+document.addEventListener('mousemove', e => {
+  const orb = document.querySelector('.hero-orb');
+  if (!orb) return;
+  const x = (e.clientX / window.innerWidth - .5) * 30;
+  const y = (e.clientY / window.innerHeight - .5) * 30;
+  orb.style.transform = `translate(${x}px,${y}px)`;
+});
+
+// ── SCROLL-TRIGGERED SKILL BARS (essay page) ──
+const barObs = new IntersectionObserver(entries => {
+  if (entries[0].isIntersecting) animateBars();
+}, { threshold: .3 });
+const barsSection = document.getElementById('skillBars');
+if (barsSection) barObs.observe(barsSection);
+</script>
+</body>
+</html>
