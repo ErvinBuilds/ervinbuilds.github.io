@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VELTRIX — Analytics Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #080810;
+    --surface: #0f0f1a;
+    --card: #141428;
+    --card2: #181830;
+    --purple: #7c3aed;
+    --purple-light: #a855f7;
+    --cyan: #06b6d4;
+    --cyan-light: #22d3ee;
+    --green: #10b981;
+    --red: #ef4444;
+    --amber: #f59e0b;
+    --text: #ffffff;
+    --text-sub: #c8c2e0;
+    --text-muted: #9088aa;
+    --border: rgba(255,255,255,0.1);
+  }
+
+  body {
+    background: #06060e;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    position: fixed; top: 0; left: 0; bottom: 0;
+    width: 220px; background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    padding: 24px 0; z-index: 50;
+  }
+  .sidebar-logo {
+    padding: 0 24px 28px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 18px; font-weight: 500;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
+  }
+  .sidebar-logo span {
+    background: linear-gradient(135deg, #a855f7, #06b6d4);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .sidebar-logo sub { font-size: 9px; color: var(--text-muted); letter-spacing: 0.2em; display: block; margin-top: 2px; -webkit-text-fill-color: var(--text-muted); }
+  .nav-section { padding: 0 12px; margin-bottom: 8px; }
+  .nav-label { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-muted); padding: 0 12px; margin-bottom: 6px; font-family: 'JetBrains Mono', monospace; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 12px; border-radius: 6px; cursor: pointer;
+    font-size: 13px; font-weight: 500; color: var(--text-sub);
+    transition: all 0.15s; margin-bottom: 2px;
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+  .nav-item.active { background: rgba(124,58,237,0.15); color: #a855f7; }
+  .nav-item .icon { font-size: 15px; width: 20px; text-align: center; }
+  .nav-badge {
+    margin-left: auto; background: var(--purple); color: #fff;
+    font-size: 10px; font-weight: 600; padding: 1px 7px; border-radius: 100px;
+  }
+  .sidebar-bottom {
+    margin-top: auto; padding: 20px 24px 0;
+    border-top: 1px solid var(--border);
+  }
+  .user-card { display: flex; align-items: center; gap: 10px; padding-top: 20px; }
+  .user-avatar {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: linear-gradient(135deg, var(--purple), var(--cyan));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0;
+  }
+  .user-name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .user-role { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+
+  /* MAIN */
+  .main {
+    margin-left: 220px; padding: 28px 32px;
+    min-height: 100vh;
+  }
+
+  /* TOPBAR */
+  .topbar {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 28px;
+  }
+  .topbar-left h1 { font-size: 26px; font-weight: 800; color: #ffffff; text-shadow: 0 0 30px rgba(168,85,247,0.4); letter-spacing: -0.02em; }
+  .topbar-left p { font-size: 13px; color: #c8c2e0; margin-top: 4px; font-weight: 400; }
+  .topbar-right { display: flex; gap: 10px; align-items: center; }
+  .date-badge {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 6px; padding: 8px 14px;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-sub);
+  }
+  .btn-export {
+    background: var(--purple); color: #fff; border: none; cursor: pointer;
+    padding: 8px 18px; border-radius: 6px; font-size: 13px; font-weight: 600;
+    font-family: 'Inter', sans-serif; transition: all 0.2s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .btn-export:hover { background: var(--purple-light); transform: translateY(-1px); }
+
+  /* STAT CARDS */
+  .stats-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+    margin-bottom: 24px;
+  }
+  .stat-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 20px 22px; position: relative; overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .stat-card:hover { border-color: rgba(124,58,237,0.3); }
+  .stat-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  }
+  .stat-card.purple::before { background: linear-gradient(90deg, var(--purple), var(--purple-light)); }
+  .stat-card.cyan::before { background: linear-gradient(90deg, var(--cyan), var(--cyan-light)); }
+  .stat-card.green::before { background: linear-gradient(90deg, #059669, var(--green)); }
+  .stat-card.amber::before { background: linear-gradient(90deg, #d97706, var(--amber)); }
+  .stat-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+  .stat-label { font-size: 12px; font-weight: 500; color: var(--text-sub); letter-spacing: 0.03em; }
+  .stat-icon { font-size: 18px; }
+  .stat-value { font-size: 28px; font-weight: 700; color: var(--text); line-height: 1; margin-bottom: 8px; }
+  .stat-change { display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 500; }
+  .stat-change.up { color: var(--green); }
+  .stat-change.down { color: var(--red); }
+  .stat-change span { color: var(--text-muted); font-weight: 400; }
+
+  /* CHARTS ROW */
+  .charts-row { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 24px; }
+
+  .chart-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 22px 24px;
+  }
+  .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  .chart-title { font-size: 14px; font-weight: 600; color: var(--text); }
+  .chart-sub { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+  .chart-tabs { display: flex; gap: 4px; }
+  .chart-tab {
+    padding: 5px 12px; border-radius: 5px; font-size: 11px; font-weight: 500;
+    cursor: pointer; color: var(--text-muted); transition: all 0.15s; border: none;
+    background: transparent; font-family: 'Inter', sans-serif;
+  }
+  .chart-tab.active { background: rgba(124,58,237,0.2); color: var(--purple-light); }
+  .chart-tab:hover:not(.active) { background: rgba(255,255,255,0.04); color: var(--text-sub); }
+
+  /* Bar Chart */
+  .bar-chart { display: flex; align-items: flex-end; gap: 8px; height: 160px; padding-top: 10px; }
+  .bar-group { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; }
+  .bar-wrap { display: flex; gap: 3px; align-items: flex-end; height: 130px; }
+  .bar {
+    width: 14px; border-radius: 3px 3px 0 0;
+    transition: opacity 0.2s; cursor: pointer;
+  }
+  .bar:hover { opacity: 0.8; }
+  .bar.purple { background: linear-gradient(180deg, var(--purple-light), var(--purple)); }
+  .bar.cyan { background: linear-gradient(180deg, var(--cyan-light), var(--cyan)); }
+  .bar-label { font-size: 10px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+  .chart-legend { display: flex; gap: 16px; margin-top: 14px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-sub); }
+  .legend-dot { width: 8px; height: 8px; border-radius: 2px; }
+
+  /* Donut Chart */
+  .donut-wrap { display: flex; flex-direction: column; align-items: center; }
+  .donut-svg { margin-bottom: 16px; }
+  .donut-stats { width: 100%; display: flex; flex-direction: column; gap: 10px; }
+  .donut-item { display: flex; align-items: center; justify-content: space-between; }
+  .donut-item-left { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-sub); }
+  .donut-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .donut-pct { font-size: 12px; font-weight: 600; color: var(--text); font-family: 'JetBrains Mono', monospace; }
+
+  /* BOTTOM ROW */
+  .bottom-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  /* Table */
+  .table-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 22px 24px; }
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    text-align: left; font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--text-muted); padding-bottom: 12px;
+    border-bottom: 1px solid var(--border); font-family: 'JetBrains Mono', monospace;
+  }
+  tbody tr { border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.15s; cursor: pointer; }
+  tbody tr:hover { background: rgba(255,255,255,0.02); }
+  tbody tr:last-child { border-bottom: none; }
+  tbody td { padding: 12px 0; font-size: 13px; color: var(--text-sub); }
+  tbody td:first-child { color: var(--text); font-weight: 500; }
+  .badge {
+    display: inline-block; padding: 2px 10px; border-radius: 100px;
+    font-size: 10px; font-weight: 600; letter-spacing: 0.05em;
+  }
+  .badge.active { background: rgba(16,185,129,0.15); color: var(--green); }
+  .badge.pending { background: rgba(245,158,11,0.15); color: var(--amber); }
+  .badge.paused { background: rgba(239,68,68,0.12); color: var(--red); }
+
+  /* Activity Feed */
+  .activity-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 22px 24px; }
+  .activity-list { display: flex; flex-direction: column; gap: 0; margin-top: 16px; }
+  .activity-item {
+    display: flex; gap: 14px; padding: 14px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .activity-item:last-child { border-bottom: none; }
+  .activity-dot-wrap { display: flex; flex-direction: column; align-items: center; gap: 0; flex-shrink: 0; padding-top: 4px; }
+  .activity-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .activity-line { width: 1px; flex: 1; background: var(--border); margin-top: 4px; min-height: 24px; }
+  .activity-item:last-child .activity-line { display: none; }
+  .activity-content { flex: 1; }
+  .activity-title { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+  .activity-desc { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+  .activity-time { font-size: 11px; color: var(--text-muted); margin-top: 5px; font-family: 'JetBrains Mono', monospace; }
+
+  /* Mini sparkline */
+  .sparkline { display: flex; align-items: flex-end; gap: 2px; height: 28px; margin-top: 8px; }
+  .spark-bar { width: 4px; border-radius: 1px; background: rgba(124,58,237,0.4); transition: background 0.2s; }
+  .spark-bar:last-child { background: var(--purple-light); }
+
+  @media (max-width: 1100px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; padding: 20px; }
+    .stats-grid { grid-template-columns: repeat(2,1fr); }
+    .charts-row { grid-template-columns: 1fr; }
+    .bottom-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <span>VELTRIX</span>
+    <sub>Analytics Platform</sub>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Main</div>
+    <div class="nav-item active"><span class="icon">📊</span> Dashboard</div>
+    <div class="nav-item"><span class="icon">📈</span> Analytics</div>
+    <div class="nav-item"><span class="icon">👥</span> Customers <span class="nav-badge">12</span></div>
+    <div class="nav-item"><span class="icon">💰</span> Revenue</div>
+  </div>
+  <div class="nav-section" style="margin-top:16px;">
+    <div class="nav-label">Marketing</div>
+    <div class="nav-item"><span class="icon">🎯</span> Campaigns</div>
+    <div class="nav-item"><span class="icon">📣</span> Social</div>
+    <div class="nav-item"><span class="icon">✉️</span> Email</div>
+  </div>
+  <div class="nav-section" style="margin-top:16px;">
+    <div class="nav-label">Settings</div>
+    <div class="nav-item"><span class="icon">⚙️</span> Settings</div>
+    <div class="nav-item"><span class="icon">🔔</span> Notifications <span class="nav-badge">3</span></div>
+  </div>
+  <div class="sidebar-bottom">
+    <div class="user-card">
+      <div class="user-avatar">AE</div>
+      <div>
+        <div class="user-name">Antonio E.</div>
+        <div class="user-role">Admin</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <h1>Dashboard</h1>
+      <p>Welcome back, Antonio. Here's what's happening today.</p>
+    </div>
+    <div class="topbar-right">
+      <div class="date-badge">May 2026</div>
+      <button class="btn-export">⬇ Export</button>
+    </div>
+  </div>
+
+  <!-- STAT CARDS -->
+  <div class="stats-grid">
+    <div class="stat-card purple">
+      <div class="stat-header">
+        <div class="stat-label">Total Revenue</div>
+        <div class="stat-icon">💰</div>
+      </div>
+      <div class="stat-value">$84,320</div>
+      <div class="stat-change up">▲ 12.4% <span>vs last month</span></div>
+      <div class="sparkline">
+        <div class="spark-bar" style="height:40%"></div>
+        <div class="spark-bar" style="height:55%"></div>
+        <div class="spark-bar" style="height:45%"></div>
+        <div class="spark-bar" style="height:65%"></div>
+        <div class="spark-bar" style="height:50%"></div>
+        <div class="spark-bar" style="height:70%"></div>
+        <div class="spark-bar" style="height:60%"></div>
+        <div class="spark-bar" style="height:85%"></div>
+        <div class="spark-bar" style="height:75%"></div>
+        <div class="spark-bar" style="height:100%"></div>
+      </div>
+    </div>
+    <div class="stat-card cyan">
+      <div class="stat-header">
+        <div class="stat-label">Active Users</div>
+        <div class="stat-icon">👥</div>
+      </div>
+      <div class="stat-value">12,847</div>
+      <div class="stat-change up">▲ 8.1% <span>vs last month</span></div>
+      <div class="sparkline">
+        <div class="spark-bar" style="height:50%;background:rgba(6,182,212,0.4)"></div>
+        <div class="spark-bar" style="height:60%;background:rgba(6,182,212,0.4)"></div>
+        <div class="spark-bar" style="height:55%;background:rgba(6,182,212,0.4)"></div>
+        <div class="spark-bar" style="height:70%;background:rgba(6,182,212,0.4)"></div>
+        <div class="spark-bar" style="height:65%;background:rgba(6,182,212,0.4)"></div>
+        <div class="spark-bar" style="height:80%;background:rgba(6,182,212,0.4)"></div>
+        <div class="spark-bar" style="height:72%;background:rgba(6,182,212,0.4)"></div>
+        <div class="spark-bar" style="height:90%;background:rgba(6,182,212,0.4)"></div>
+        <div class="spark-bar" style="height:85%;background:rgba(6,182,212,0.4)"></div>
+        <div class="spark-bar" style="height:100%;background:var(--cyan-light)"></div>
+      </div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-header">
+        <div class="stat-label">Conversion Rate</div>
+        <div class="stat-icon">🎯</div>
+      </div>
+      <div class="stat-value">3.68%</div>
+      <div class="stat-change up">▲ 0.4% <span>vs last month</span></div>
+      <div class="sparkline">
+        <div class="spark-bar" style="height:45%;background:rgba(16,185,129,0.4)"></div>
+        <div class="spark-bar" style="height:50%;background:rgba(16,185,129,0.4)"></div>
+        <div class="spark-bar" style="height:48%;background:rgba(16,185,129,0.4)"></div>
+        <div class="spark-bar" style="height:55%;background:rgba(16,185,129,0.4)"></div>
+        <div class="spark-bar" style="height:60%;background:rgba(16,185,129,0.4)"></div>
+        <div class="spark-bar" style="height:58%;background:rgba(16,185,129,0.4)"></div>
+        <div class="spark-bar" style="height:70%;background:rgba(16,185,129,0.4)"></div>
+        <div class="spark-bar" style="height:80%;background:rgba(16,185,129,0.4)"></div>
+        <div class="spark-bar" style="height:90%;background:rgba(16,185,129,0.4)"></div>
+        <div class="spark-bar" style="height:100%;background:var(--green)"></div>
+      </div>
+    </div>
+    <div class="stat-card amber">
+      <div class="stat-header">
+        <div class="stat-label">Churn Rate</div>
+        <div class="stat-icon">📉</div>
+      </div>
+      <div class="stat-value">1.2%</div>
+      <div class="stat-change down">▼ 0.3% <span>vs last month</span></div>
+      <div class="sparkline">
+        <div class="spark-bar" style="height:80%;background:rgba(245,158,11,0.4)"></div>
+        <div class="spark-bar" style="height:70%;background:rgba(245,158,11,0.4)"></div>
+        <div class="spark-bar" style="height:75%;background:rgba(245,158,11,0.4)"></div>
+        <div class="spark-bar" style="height:65%;background:rgba(245,158,11,0.4)"></div>
+        <div class="spark-bar" style="height:60%;background:rgba(245,158,11,0.4)"></div>
+        <div class="spark-bar" style="height:55%;background:rgba(245,158,11,0.4)"></div>
+        <div class="spark-bar" style="height:50%;background:rgba(245,158,11,0.4)"></div>
+        <div class="spark-bar" style="height:45%;background:rgba(245,158,11,0.4)"></div>
+        <div class="spark-bar" style="height:40%;background:rgba(245,158,11,0.4)"></div>
+        <div class="spark-bar" style="height:35%;background:var(--amber)"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHARTS ROW -->
+  <div class="charts-row">
+
+    <!-- Bar Chart -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">Revenue vs Sessions</div>
+          <div class="chart-sub">Monthly performance overview</div>
+        </div>
+        <div class="chart-tabs">
+          <button class="chart-tab active">6M</button>
+          <button class="chart-tab">1Y</button>
+          <button class="chart-tab">All</button>
+        </div>
+      </div>
+      <div class="bar-chart">
+        <div class="bar-group">
+          <div class="bar-wrap">
+            <div class="bar purple" style="height:65px"></div>
+            <div class="bar cyan"   style="height:48px"></div>
+          </div>
+          <div class="bar-label">Dec</div>
+        </div>
+        <div class="bar-group">
+          <div class="bar-wrap">
+            <div class="bar purple" style="height:80px"></div>
+            <div class="bar cyan"   style="height:60px"></div>
+          </div>
+          <div class="bar-label">Jan</div>
+        </div>
+        <div class="bar-group">
+          <div class="bar-wrap">
+            <div class="bar purple" style="height:72px"></div>
+            <div class="bar cyan"   style="height:55px"></div>
+          </div>
+          <div class="bar-label">Feb</div>
+        </div>
+        <div class="bar-group">
+          <div class="bar-wrap">
+            <div class="bar purple" style="height:95px"></div>
+            <div class="bar cyan"   style="height:70px"></div>
+          </div>
+          <div class="bar-label">Mar</div>
+        </div>
+        <div class="bar-group">
+          <div class="bar-wrap">
+            <div class="bar purple" style="height:88px"></div>
+            <div class="bar cyan"   style="height:75px"></div>
+          </div>
+          <div class="bar-label">Apr</div>
+        </div>
+        <div class="bar-group">
+          <div class="bar-wrap">
+            <div class="bar purple" style="height:120px"></div>
+            <div class="bar cyan"   style="height:90px"></div>
+          </div>
+          <div class="bar-label">May</div>
+        </div>
+      </div>
+      <div class="chart-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div> Revenue</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--cyan)"></div> Sessions</div>
+      </div>
+    </div>
+
+    <!-- Donut Chart -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">Traffic Sources</div>
+          <div class="chart-sub">Where users come from</div>
+        </div>
+      </div>
+      <div class="donut-wrap">
+        <svg class="donut-svg" width="140" height="140" viewBox="0 0 140 140">
+          <!-- Background circle -->
+          <circle cx="70" cy="70" r="52" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="18"/>
+          <!-- Organic Search 38% -->
+          <circle cx="70" cy="70" r="52" fill="none" stroke="#7c3aed" stroke-width="18"
+            stroke-dasharray="124 202" stroke-dashoffset="0" transform="rotate(-90 70 70)"/>
+          <!-- Direct 27% -->
+          <circle cx="70" cy="70" r="52" fill="none" stroke="#06b6d4" stroke-width="18"
+            stroke-dasharray="88 238" stroke-dashoffset="-124" transform="rotate(-90 70 70)"/>
+          <!-- Social 20% -->
+          <circle cx="70" cy="70" r="52" fill="none" stroke="#10b981" stroke-width="18"
+            stroke-dasharray="65 261" stroke-dashoffset="-212" transform="rotate(-90 70 70)"/>
+          <!-- Email 15% -->
+          <circle cx="70" cy="70" r="52" fill="none" stroke="#f59e0b" stroke-width="18"
+            stroke-dasharray="49 277" stroke-dashoffset="-277" transform="rotate(-90 70 70)"/>
+          <!-- Center text -->
+          <text x="70" y="66" text-anchor="middle" fill="#f1f0f8" font-size="18" font-weight="700" font-family="Inter">100%</text>
+          <text x="70" y="80" text-anchor="middle" fill="#5a5475" font-size="9" font-family="JetBrains Mono">total</text>
+        </svg>
+        <div class="donut-stats">
+          <div class="donut-item">
+            <div class="donut-item-left"><div class="donut-dot" style="background:#7c3aed"></div>Organic Search</div>
+            <div class="donut-pct">38%</div>
+          </div>
+          <div class="donut-item">
+            <div class="donut-item-left"><div class="donut-dot" style="background:#06b6d4"></div>Direct</div>
+            <div class="donut-pct">27%</div>
+          </div>
+          <div class="donut-item">
+            <div class="donut-item-left"><div class="donut-dot" style="background:#10b981"></div>Social Media</div>
+            <div class="donut-pct">20%</div>
+          </div>
+          <div class="donut-item">
+            <div class="donut-item-left"><div class="donut-dot" style="background:#f59e0b"></div>Email</div>
+            <div class="donut-pct">15%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM ROW -->
+  <div class="bottom-row">
+
+    <!-- Campaigns Table -->
+    <div class="table-card">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">Active Campaigns</div>
+          <div class="chart-sub">Current marketing performance</div>
+        </div>
+        <button class="chart-tab active" style="font-size:12px;padding:6px 14px;border-radius:6px;background:rgba(124,58,237,0.15);color:#a855f7;border:none;cursor:pointer;">View All</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Campaign</th>
+            <th>Status</th>
+            <th>Clicks</th>
+            <th>CVR</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Spring Launch '26</td>
+            <td><span class="badge active">Active</span></td>
+            <td>8,420</td>
+            <td style="color:var(--green)">4.2%</td>
+          </tr>
+          <tr>
+            <td>Retargeting Q2</td>
+            <td><span class="badge active">Active</span></td>
+            <td>5,180</td>
+            <td style="color:var(--green)">3.8%</td>
+          </tr>
+          <tr>
+            <td>Brand Awareness</td>
+            <td><span class="badge pending">Pending</span></td>
+            <td>2,940</td>
+            <td style="color:var(--amber)">1.9%</td>
+          </tr>
+          <tr>
+            <td>Email Drip — Pro</td>
+            <td><span class="badge active">Active</span></td>
+            <td>11,200</td>
+            <td style="color:var(--green)">5.1%</td>
+          </tr>
+          <tr>
+            <td>Social Boost May</td>
+            <td><span class="badge paused">Paused</span></td>
+            <td>3,650</td>
+            <td style="color:var(--red)">0.8%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Activity Feed -->
+    <div class="activity-card">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">Recent Activity</div>
+          <div class="chart-sub">Latest platform events</div>
+        </div>
+      </div>
+      <div class="activity-list">
+        <div class="activity-item">
+          <div class="activity-dot-wrap">
+            <div class="activity-dot" style="background:var(--green)"></div>
+            <div class="activity-line"></div>
+          </div>
+          <div class="activity-content">
+            <div class="activity-title">New signup — Pro Plan</div>
+            <div class="activity-desc">marcus.dev@email.com upgraded from Free to Pro</div>
+            <div class="activity-time">2 min ago</div>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-dot-wrap">
+            <div class="activity-dot" style="background:var(--purple-light)"></div>
+            <div class="activity-line"></div>
+          </div>
+          <div class="activity-content">
+            <div class="activity-title">Campaign launched</div>
+            <div class="activity-desc">Spring Launch '26 went live — targeting 14K users</div>
+            <div class="activity-time">18 min ago</div>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-dot-wrap">
+            <div class="activity-dot" style="background:var(--cyan)"></div>
+            <div class="activity-line"></div>
+          </div>
+          <div class="activity-content">
+            <div class="activity-title">Revenue milestone hit</div>
+            <div class="activity-desc">Monthly revenue crossed $80K for the first time</div>
+            <div class="activity-time">1 hr ago</div>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-dot-wrap">
+            <div class="activity-dot" style="background:var(--amber)"></div>
+            <div class="activity-line"></div>
+          </div>
+          <div class="activity-content">
+            <div class="activity-title">API rate limit warning</div>
+            <div class="activity-desc">Workspace "Team Alpha" approaching monthly limit</div>
+            <div class="activity-time">3 hr ago</div>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-dot-wrap">
+            <div class="activity-dot" style="background:var(--red)"></div>
+            <div class="activity-line"></div>
+          </div>
+          <div class="activity-content">
+            <div class="activity-title">Campaign paused</div>
+            <div class="activity-desc">Social Boost May paused — budget exhausted</div>
+            <div class="activity-time">5 hr ago</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+</body>
+</html>

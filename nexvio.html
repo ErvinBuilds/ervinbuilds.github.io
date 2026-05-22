@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXVIO — Work Smarter. Scale Faster.</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --black: #08080f;
+    --dark: #0c0c16;
+    --card: #12121e;
+    --blue: #0055ff;
+    --blue-light: #4488ff;
+    --cyan: #00ccff;
+    --text: #e8e8f0;
+    --text-sub: #b8b8cc;
+    --border: rgba(255,255,255,0.1);
+  }
+
+  html { scroll-behavior: smooth; }
+  body { background: var(--black); color: var(--text); font-family: 'Space Grotesk', sans-serif; overflow-x: hidden; }
+
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 20px 60px; display: flex; justify-content: space-between; align-items: center;
+    background: #08080f; border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800;
+    background: linear-gradient(135deg, #4488ff, #00ccff);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .nav-links { display: flex; gap: 36px; }
+  .nav-links a { color: #b8b8cc; text-decoration: none; font-size: 13px; font-weight: 500; transition: color 0.2s; }
+  .nav-links a:hover { color: #ffffff; }
+  .nav-actions { display: flex; gap: 12px; }
+  .btn-ghost-sm {
+    background: transparent; color: #e8e8f0; border: 2px solid rgba(255,255,255,0.25);
+    cursor: pointer; padding: 9px 22px; font-size: 13px; font-weight: 600;
+    font-family: 'Space Grotesk', sans-serif; border-radius: 4px; transition: all 0.2s;
+  }
+  .btn-ghost-sm:hover { border-color: #4488ff; color: #4488ff; }
+  .btn-nav-cta {
+    background: #0055ff; color: #ffffff; border: none; cursor: pointer;
+    padding: 9px 22px; font-size: 13px; font-weight: 600;
+    font-family: 'Space Grotesk', sans-serif; border-radius: 4px; transition: all 0.2s;
+  }
+  .btn-nav-cta:hover { background: #4488ff; }
+
+  .hero {
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center;
+    padding: 140px 60px 80px; background: var(--black);
+    border-bottom: 1px solid var(--border);
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: #12121e; border: 1px solid rgba(0,136,255,0.4);
+    padding: 7px 18px; border-radius: 100px; margin-bottom: 36px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    font-weight: 500; color: #00ccff; letter-spacing: 0.05em;
+  }
+  .hero-badge::before { content: '◆'; font-size: 8px; color: #4488ff; animation: blink 2s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+  .hero-title {
+    font-family: 'Syne', sans-serif; font-size: clamp(48px, 8vw, 96px);
+    font-weight: 800; line-height: 1.05; letter-spacing: -0.02em; margin-bottom: 12px; color: #ffffff;
+  }
+  .hero-title .grad {
+    background: linear-gradient(135deg, #4488ff, #00ccff);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .hero-tagline {
+    font-family: 'JetBrains Mono', monospace; font-size: 14px; color: #00ccff;
+    letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 28px; font-weight: 500;
+  }
+  .hero-sub {
+    font-size: 17px; font-weight: 400; color: #b8b8cc;
+    max-width: 540px; line-height: 1.7; margin-bottom: 44px;
+  }
+  .hero-sub strong { color: #ffffff; font-weight: 600; }
+  .hero-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-bottom: 72px; }
+  .btn-primary {
+    background: #0055ff; color: #ffffff; border: none; cursor: pointer;
+    padding: 15px 38px; font-size: 15px; font-weight: 700;
+    font-family: 'Space Grotesk', sans-serif; border-radius: 6px; transition: all 0.2s;
+  }
+  .btn-primary:hover { background: #4488ff; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,85,255,0.4); }
+  .btn-secondary {
+    background: #1a1a2e; color: #ffffff; cursor: pointer;
+    border: 2px solid rgba(255,255,255,0.3);
+    padding: 15px 38px; font-size: 15px; font-weight: 700;
+    font-family: 'Space Grotesk', sans-serif; border-radius: 6px; transition: all 0.2s;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .btn-secondary:hover { border-color: #4488ff; color: #4488ff; }
+  .hero-stats { display: flex; gap: 48px; justify-content: center; padding-top: 40px; border-top: 1px solid var(--border); flex-wrap: wrap; }
+  .stat-num {
+    font-family: 'Syne', sans-serif; font-size: 38px; font-weight: 800;
+    background: linear-gradient(135deg, #4488ff, #00ccff);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    line-height: 1; text-align: center;
+  }
+  .stat-label { font-size: 12px; color: #b8b8cc; margin-top: 5px; text-align: center; font-weight: 500; }
+
+  .demo-section { padding: 80px 60px; background: var(--dark); border-bottom: 1px solid var(--border); }
+  .demo-window {
+    background: #0c0c18; border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 12px; overflow: hidden; max-width: 880px; margin: 0 auto;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.7);
+  }
+  .demo-bar {
+    background: #141420; padding: 14px 20px;
+    display: flex; align-items: center; gap: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .demo-dot { width: 12px; height: 12px; border-radius: 50%; }
+  .demo-dot:nth-child(1) { background: #ff5f57; }
+  .demo-dot:nth-child(2) { background: #febc2e; }
+  .demo-dot:nth-child(3) { background: #28c840; }
+  .demo-url {
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 4px; padding: 4px 14px; margin: 0 auto;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888899;
+  }
+  .demo-body { padding: 28px; display: grid; grid-template-columns: 200px 1fr; gap: 24px; min-height: 340px; }
+  .demo-sidebar { border-right: 1px solid rgba(255,255,255,0.08); padding-right: 20px; }
+  .demo-nav-item {
+    padding: 10px 14px; border-radius: 6px; margin-bottom: 4px;
+    font-size: 13px; font-weight: 600; color: #b8b8cc; cursor: pointer;
+    display: flex; align-items: center; gap: 10px; transition: all 0.2s;
+  }
+  .demo-nav-item.active { background: rgba(0,85,255,0.25); color: #ffffff; border: 1px solid rgba(68,136,255,0.5); }
+  .demo-nav-item:hover:not(.active) { background: rgba(255,255,255,0.06); color: #ffffff; }
+  .demo-main { display: flex; flex-direction: column; gap: 16px; }
+  .demo-prompt { background: rgba(0,85,255,0.12); border: 1px solid rgba(68,136,255,0.4); border-radius: 8px; padding: 16px 20px; }
+  .demo-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 8px; font-family: 'JetBrains Mono', monospace; font-weight: 600; }
+  .demo-prompt .demo-label { color: #4488ff; }
+  .demo-prompt-text { font-size: 14px; color: #e8e8f0; line-height: 1.6; }
+  .demo-response { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 16px 20px; }
+  .demo-response .demo-label { color: #00ccff; }
+  .demo-response-text { font-size: 13px; color: #ccccdd; line-height: 1.8; }
+  .demo-response-text strong { color: #ffffff; }
+  .typing-cursor { display: inline-block; width: 2px; height: 14px; background: #00ccff; margin-left: 2px; animation: blink 1s infinite; vertical-align: middle; }
+
+  .features { padding: 120px 60px; background: var(--black); }
+  .section-label {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    letter-spacing: 0.3em; text-transform: uppercase; color: #4488ff;
+    margin-bottom: 16px; display: flex; align-items: center; gap: 10px;
+  }
+  .section-label::before { content: '//'; color: #888899; }
+  .section-title {
+    font-family: 'Syne', sans-serif; font-size: clamp(36px, 5vw, 58px);
+    font-weight: 800; line-height: 1.05; letter-spacing: -0.02em; margin-bottom: 16px; color: #ffffff;
+  }
+  .section-title .grad {
+    background: linear-gradient(135deg, #4488ff, #00ccff);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .section-sub { font-size: 16px; color: #b8b8cc; max-width: 480px; line-height: 1.7; margin-bottom: 60px; }
+  .features-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .feature-card {
+    background: #12121e; padding: 44px 36px; border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s; position: relative; overflow: hidden;
+  }
+  .feature-card:hover { transform: translateY(-4px); border-color: rgba(68,136,255,0.5); background: #16162a; }
+  .feature-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, #0055ff, #00ccff);
+    transform: scaleX(0); transition: transform 0.4s; transform-origin: left;
+  }
+  .feature-card:hover::before { transform: scaleX(1); }
+  .feature-icon {
+    width: 52px; height: 52px; border-radius: 10px;
+    background: rgba(0,85,255,0.15); border: 1px solid rgba(68,136,255,0.3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; margin-bottom: 22px;
+  }
+  .feature-title { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; color: #ffffff; margin-bottom: 12px; }
+  .feature-desc { font-size: 14px; line-height: 1.8; color: #b8b8cc; margin-bottom: 24px; }
+  .feature-tag {
+    display: inline-block; background: rgba(0,204,255,0.1); border: 1px solid rgba(0,204,255,0.3);
+    border-radius: 4px; padding: 4px 12px;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #00ccff;
+  }
+
+  .pricing { padding: 120px 60px; background: var(--dark); }
+  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 60px; }
+  .pricing-card {
+    background: #12121e; padding: 44px 32px; border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.1); transition: transform 0.3s; position: relative;
+  }
+  .pricing-card:hover { transform: translateY(-4px); }
+  .pricing-card.featured { background: #0d1a40; border-color: rgba(68,136,255,0.5); }
+  .pricing-card.featured::before {
+    content: 'MOST POPULAR';
+    position: absolute; top: -1px; left: 50%; transform: translateX(-50%);
+    background: linear-gradient(135deg, #0055ff, #00ccff);
+    color: #ffffff; font-size: 10px; font-weight: 700;
+    letter-spacing: 0.2em; padding: 5px 18px; border-radius: 0 0 6px 6px;
+    font-family: 'JetBrains Mono', monospace; white-space: nowrap;
+  }
+  .pricing-tier { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #888899; margin-bottom: 14px; font-weight: 600; }
+  .pricing-price { font-family: 'Syne', sans-serif; font-size: 52px; font-weight: 800; line-height: 1; margin-bottom: 6px; color: #ffffff; }
+  .pricing-price sub { font-size: 16px; font-weight: 400; color: #888899; }
+  .pricing-price.grad { background: linear-gradient(135deg, #4488ff, #00ccff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .student-badge {
+    display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+    background: rgba(0,204,255,0.1); border: 1px solid rgba(0,204,255,0.3);
+    border-radius: 4px; padding: 6px 12px; margin-bottom: 14px;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #00ccff; line-height: 1.6;
+  }
+  .student-badge s { color: #666677; }
+  .student-badge strong { color: #ffffff; }
+  .pricing-desc { font-size: 13px; color: #b8b8cc; margin-bottom: 28px; line-height: 1.6; }
+  .pricing-features { list-style: none; margin-bottom: 32px; display: flex; flex-direction: column; gap: 12px; }
+  .pricing-features li { font-size: 13px; display: flex; align-items: center; gap: 10px; }
+  .pricing-features li::before { content: '✓'; font-weight: 700; flex-shrink: 0; }
+  .pricing-features li.on { color: #e8e8f0; font-weight: 500; }
+  .pricing-features li.on::before { color: #00ccff; }
+  .pricing-features li.off { color: #555566; }
+  .pricing-features li.off::before { color: #444455; content: '✕'; }
+  .btn-pricing {
+    width: 100%; padding: 13px; border-radius: 6px; cursor: pointer;
+    font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 700;
+    transition: all 0.2s; border: 2px solid rgba(255,255,255,0.2);
+    background: transparent; color: #e8e8f0;
+  }
+  .btn-pricing:hover { border-color: #4488ff; color: #4488ff; }
+  .btn-pricing.featured-btn { background: #0055ff; border-color: #0055ff; color: #ffffff; }
+  .btn-pricing.featured-btn:hover { background: #4488ff; border-color: #4488ff; }
+
+  .testimonials { padding: 100px 60px; background: var(--black); }
+  .testimonial-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 60px; }
+  .testimonial-card {
+    background: #12121e; border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px; padding: 36px 28px; transition: border-color 0.3s;
+  }
+  .testimonial-card:hover { border-color: rgba(68,136,255,0.4); }
+  .testimonial-stars { color: #00ccff; font-size: 14px; letter-spacing: 3px; margin-bottom: 18px; }
+  .testimonial-text { font-size: 15px; line-height: 1.8; color: #ccccdd; margin-bottom: 24px; font-style: italic; }
+  .testimonial-author { display: flex; align-items: center; gap: 12px; }
+  .author-avatar {
+    width: 42px; height: 42px; border-radius: 8px; flex-shrink: 0;
+    background: linear-gradient(135deg, #0055ff, #00ccff);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 800; color: #ffffff;
+  }
+  .author-name { font-size: 14px; font-weight: 700; color: #ffffff; }
+  .author-role { font-size: 11px; color: #888899; margin-top: 2px; font-family: 'JetBrains Mono', monospace; }
+
+  .cta-section { padding: 120px 60px; text-align: center; background: var(--dark); border-top: 1px solid var(--border); }
+  .cta-title {
+    font-family: 'Syne', sans-serif; font-size: clamp(40px, 6vw, 68px);
+    font-weight: 800; line-height: 1.05; letter-spacing: -0.02em; margin-bottom: 20px; color: #ffffff;
+  }
+  .cta-title .grad { background: linear-gradient(135deg, #4488ff, #00ccff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .cta-sub { font-size: 16px; color: #b8b8cc; max-width: 420px; margin: 0 auto 48px; line-height: 1.7; }
+  .email-form { display: flex; max-width: 440px; margin: 0 auto; }
+  .email-input {
+    flex: 1; padding: 14px 20px; background: #12121e;
+    border: 2px solid rgba(255,255,255,0.15); border-right: none;
+    border-radius: 6px 0 0 6px; color: #ffffff;
+    font-family: 'Space Grotesk', sans-serif; font-size: 14px; outline: none; transition: border-color 0.2s;
+  }
+  .email-input::placeholder { color: #888899; }
+  .email-input:focus { border-color: #0055ff; }
+  .email-submit {
+    background: #0055ff; color: #ffffff; border: none; cursor: pointer;
+    padding: 14px 28px; font-size: 13px; font-weight: 700;
+    font-family: 'Space Grotesk', sans-serif; border-radius: 0 6px 6px 0; transition: background 0.2s; white-space: nowrap;
+  }
+  .email-submit:hover { background: #4488ff; }
+  .cta-fine { font-size: 11px; color: #555566; margin-top: 14px; font-family: 'JetBrains Mono', monospace; }
+
+  footer {
+    padding: 44px 60px; background: var(--black); border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .footer-logo { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; background: linear-gradient(135deg, #4488ff, #00ccff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .footer-links { display: flex; gap: 28px; }
+  .footer-links a { font-size: 12px; color: #888899; text-decoration: none; transition: color 0.2s; font-family: 'JetBrains Mono', monospace; }
+  .footer-links a:hover { color: #ffffff; }
+  .footer-copy { font-size: 11px; color: #444455; font-family: 'JetBrains Mono', monospace; }
+
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 900px) {
+    nav { padding: 16px 20px; }
+    .nav-links { display: none; }
+    .hero { padding: 100px 20px 60px; }
+    .hero-stats { gap: 24px; }
+    .demo-section { padding: 40px 20px; }
+    .demo-body { grid-template-columns: 1fr; }
+    .demo-sidebar { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.08); padding-right: 0; padding-bottom: 16px; margin-bottom: 16px; }
+    .features { padding: 80px 20px; }
+    .features-grid { grid-template-columns: 1fr; }
+    .pricing { padding: 80px 20px; }
+    .pricing-grid { grid-template-columns: 1fr; }
+    .testimonials { padding: 80px 20px; }
+    .testimonial-grid { grid-template-columns: 1fr; }
+    .cta-section { padding: 80px 20px; }
+    .email-form { flex-direction: column; }
+    .email-input { border-right: 2px solid rgba(255,255,255,0.15); border-bottom: none; border-radius: 6px 6px 0 0; }
+    .email-submit { border-radius: 0 0 6px 6px; }
+    footer { flex-direction: column; gap: 20px; padding: 32px 20px; text-align: center; }
+    .footer-links { flex-wrap: wrap; justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">NEXVIO</div>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#reviews">Reviews</a>
+    <a href="#start">Get Started</a>
+  </div>
+  <div class="nav-actions">
+    <button class="btn-ghost-sm">Log In</button>
+    <button class="btn-nav-cta">Try Free</button>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-badge">AI-Powered Workspace — Now in Beta</div>
+  <h1 class="hero-title">Your AI that actually<br><span class="grad">gets stuff done.</span></h1>
+  <p class="hero-tagline">Work Smarter. Scale Faster.</p>
+  <p class="hero-sub">NEXVIO is the AI productivity tool built for <strong>students and professionals</strong> who move fast and think bigger. Write, plan, brainstorm, and execute — all in one place.</p>
+  <div class="hero-actions">
+    <button class="btn-primary">Start for Free →</button>
+    <button class="btn-secondary">▶ See it in action</button>
+  </div>
+  <div class="hero-stats">
+    <div><div class="stat-num">50K+</div><div class="stat-label">Active Users</div></div>
+    <div><div class="stat-num">4.9★</div><div class="stat-label">Avg Rating</div></div>
+    <div><div class="stat-num">10x</div><div class="stat-label">Faster Output</div></div>
+    <div><div class="stat-num">99%</div><div class="stat-label">Uptime</div></div>
+  </div>
+</section>
+
+<section class="demo-section">
+  <div class="demo-window reveal">
+    <div class="demo-bar">
+      <div class="demo-dot"></div><div class="demo-dot"></div><div class="demo-dot"></div>
+      <div class="demo-url">app.nexvio.ai/workspace</div>
+    </div>
+    <div class="demo-body">
+      <div class="demo-sidebar">
+        <div class="demo-nav-item active">🤖 AI Assistant</div>
+        <div class="demo-nav-item">✅ Task Manager</div>
+        <div class="demo-nav-item">💡 Idea Generator</div>
+        <div class="demo-nav-item">📝 Meeting Notes</div>
+        <div class="demo-nav-item">📊 Analytics</div>
+      </div>
+      <div class="demo-main">
+        <div class="demo-prompt">
+          <div class="demo-label">You</div>
+          <div class="demo-prompt-text">Write me a professional email to my professor asking for a deadline extension on my software engineering project.</div>
+        </div>
+        <div class="demo-response">
+          <div class="demo-label">NEXVIO AI</div>
+          <div class="demo-response-text"><strong>Subject: Request for Project Deadline Extension</strong><br><br>Dear Professor, I hope this message finds you well. I am writing to respectfully request a brief extension on the upcoming software engineering project deadline. I have been making strong progress, however I want to ensure the quality of my submission meets the standards of this course...<div class="typing-cursor"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="features" id="features">
+  <div class="section-label">What it does</div>
+  <h2 class="section-title">Everything you need.<br><span class="grad">Nothing you don't.</span></h2>
+  <p class="section-sub">Four tools. One workspace. Built for the way students and professionals actually work.</p>
+  <div class="features-grid">
+    <div class="feature-card reveal">
+      <div class="feature-icon">✍️</div>
+      <div class="feature-title">AI Writing Assistant</div>
+      <p class="feature-desc">Emails, essays, reports, cover letters — tell NEXVIO what you need and watch it write. Edit, refine, and make it yours in seconds.</p>
+      <span class="feature-tag">writing.generate()</span>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-icon">✅</div>
+      <div class="feature-title">Smart Task Manager</div>
+      <p class="feature-desc">Dump all your tasks and let AI sort them by priority, deadline, and effort. Stop guessing what to do next — NEXVIO tells you.</p>
+      <span class="feature-tag">tasks.prioritize()</span>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-icon">💡</div>
+      <div class="feature-title">Idea Generator</div>
+      <p class="feature-desc">Stuck on a project idea, business concept, or creative direction? Describe what you're working on and NEXVIO generates 10 ideas instantly.</p>
+      <span class="feature-tag">ideas.generate()</span>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-icon">📝</div>
+      <div class="feature-title">Meeting Summarizer</div>
+      <p class="feature-desc">Paste any meeting transcript or class notes and get a clean, organized summary with action items highlighted. Never miss a detail again.</p>
+      <span class="feature-tag">notes.summarize()</span>
+    </div>
+  </div>
+</section>
+
+<section class="pricing" id="pricing">
+  <div class="section-label">Pricing</div>
+  <h2 class="section-title">Start free.<br><span class="grad">Scale when ready.</span></h2>
+  <div class="pricing-grid">
+    <div class="pricing-card reveal">
+      <div class="pricing-tier">Starter</div>
+      <div class="pricing-price">$0<sub>/mo</sub></div>
+      <p class="pricing-desc">Perfect for students just getting started. No credit card needed.</p>
+      <ul class="pricing-features">
+        <li class="on">50 AI requests/month</li>
+        <li class="on">AI Writing Assistant</li>
+        <li class="on">Basic Task Manager</li>
+        <li class="off">Idea Generator</li>
+        <li class="off">Meeting Summarizer</li>
+        <li class="off">Priority Support</li>
+      </ul>
+      <button class="btn-pricing">Get Started Free</button>
+    </div>
+    <div class="pricing-card featured reveal">
+      <div class="pricing-tier">Pro</div>
+      <div class="pricing-price grad">$12<sub>/mo</sub></div>
+      <div class="student-badge">🎓 Students: <s>$12</s> <strong>$6/mo</strong> — valid at all universities worldwide</div>
+      <p class="pricing-desc">For students and professionals who need full power every day.</p>
+      <ul class="pricing-features">
+        <li class="on">Unlimited AI requests</li>
+        <li class="on">All 4 AI Tools</li>
+        <li class="on">Smart Task Prioritization</li>
+        <li class="on">Idea Generator</li>
+        <li class="on">Meeting Summarizer</li>
+        <li class="on">Priority Support</li>
+      </ul>
+      <button class="btn-pricing featured-btn">Start Pro Today</button>
+    </div>
+    <div class="pricing-card reveal">
+      <div class="pricing-tier">Team</div>
+      <div class="pricing-price">$29<sub>/mo</sub></div>
+      <p class="pricing-desc">For small teams and study groups who need to collaborate.</p>
+      <ul class="pricing-features">
+        <li class="on">Everything in Pro</li>
+        <li class="on">Up to 5 team members</li>
+        <li class="on">Shared workspace</li>
+        <li class="on">Team analytics</li>
+        <li class="on">Admin controls</li>
+        <li class="on">Dedicated support</li>
+      </ul>
+      <button class="btn-pricing">Start Team Plan</button>
+    </div>
+  </div>
+</section>
+
+<section class="testimonials" id="reviews">
+  <div class="section-label">Real users</div>
+  <h2 class="section-title">They tried it.<br><span class="grad">They stayed.</span></h2>
+  <div class="testimonial-grid">
+    <div class="testimonial-card reveal">
+      <div class="testimonial-stars">★★★★★</div>
+      <p class="testimonial-text">"I used to spend 2 hours writing emails and reports. NEXVIO cuts that down to 10 minutes. As a CS student with 5 classes this literally saved my GPA."</p>
+      <div class="testimonial-author">
+        <div class="author-avatar">AJ</div>
+        <div><div class="author-name">Aisha J.</div><div class="author-role">CS Student @ UNC</div></div>
+      </div>
+    </div>
+    <div class="testimonial-card reveal">
+      <div class="testimonial-stars">★★★★★</div>
+      <p class="testimonial-text">"The idea generator is insane. I was completely stuck on my startup pitch and NEXVIO gave me 10 angles I hadn't even thought of. Closed my first client that week."</p>
+      <div class="testimonial-author">
+        <div class="author-avatar">DM</div>
+        <div><div class="author-name">Devon M.</div><div class="author-role">Entrepreneur</div></div>
+      </div>
+    </div>
+    <div class="testimonial-card reveal">
+      <div class="testimonial-stars">★★★★★</div>
+      <p class="testimonial-text">"Meeting summarizer is the one. I paste my lecture recordings and get clean notes instantly. I don't know how I survived college without this fr."</p>
+      <div class="testimonial-author">
+        <div class="author-avatar">TW</div>
+        <div><div class="author-name">Tyler W.</div><div class="author-role">Engineering Student</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-section" id="start">
+  <h2 class="cta-title">Ready to work<br><span class="grad">smarter?</span></h2>
+  <p class="cta-sub">Join 50,000+ students and professionals already using NEXVIO to get more done in less time.</p>
+  <div class="email-form">
+    <input type="email" class="email-input" placeholder="Enter your email...">
+    <button class="email-submit">Get Started Free</button>
+  </div>
+  <p class="cta-fine">// free forever plan available. no credit card required.</p>
+</section>
+
+<footer>
+  <div class="footer-logo">NEXVIO</div>
+  <div class="footer-links">
+    <a href="#">features</a><a href="#">pricing</a><a href="#">docs</a><a href="#">contact</a>
+  </div>
+  <div class="footer-copy">© 2026 NEXVIO. All rights reserved.</div>
+</footer>
+
+<script>
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) setTimeout(() => entry.target.classList.add('visible'), i * 80);
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

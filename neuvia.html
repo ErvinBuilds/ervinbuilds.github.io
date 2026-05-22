@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEUVIA — Every Mind Has a Path.</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0e0b14;
+    --dark: #130f1c;
+    --card: #1a1526;
+    --purple: #7c3aed;
+    --purple-light: #a855f7;
+    --lavender: #c4b5fd;
+    --soft: #e9d5ff;
+    --teal: #2dd4bf;
+    --text: #f0eaf8;
+    --text-sub: #c4b5cc;
+    --text-muted: #8a7a99;
+    --border: rgba(196,181,253,0.12);
+  }
+
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; overflow-x: hidden; }
+
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 20px 60px; display: flex; justify-content: space-between; align-items: center;
+    background: rgba(14,11,20,0.95); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-family: 'DM Serif Display', serif; font-size: 24px;
+    background: linear-gradient(135deg, var(--lavender), var(--teal));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .nav-links { display: flex; gap: 36px; }
+  .nav-links a { color: var(--text-sub); text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--text); }
+  .nav-cta {
+    background: var(--purple); color: #ffffff; border: none; cursor: pointer;
+    padding: 10px 24px; font-size: 13px; font-weight: 600;
+    font-family: 'DM Sans', sans-serif; border-radius: 100px; transition: all 0.2s;
+  }
+  .nav-cta:hover { background: var(--purple-light); transform: translateY(-1px); }
+
+  .hero {
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center;
+    padding: 140px 60px 80px; background: var(--bg);
+    border-bottom: 1px solid var(--border); position: relative; overflow: hidden;
+  }
+  .hero-dots {
+    position: absolute; inset: 0; pointer-events: none;
+    background-image: radial-gradient(rgba(196,181,253,0.08) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(124,58,237,0.15); border: 1px solid rgba(124,58,237,0.35);
+    padding: 7px 18px; border-radius: 100px; margin-bottom: 36px;
+    font-family: 'DM Mono', monospace; font-size: 12px; color: var(--lavender);
+    letter-spacing: 0.05em; position: relative; z-index: 1;
+  }
+  .hero-badge span { width: 8px; height: 8px; background: var(--teal); border-radius: 50%; animation: pulse 2s infinite; display: inline-block; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+  .hero-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(48px, 8vw, 92px); line-height: 1.05;
+    margin-bottom: 16px; color: #ffffff; position: relative; z-index: 1;
+  }
+  .hero-title em {
+    font-style: italic;
+    background: linear-gradient(135deg, var(--lavender), var(--teal));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .hero-tagline {
+    font-family: 'DM Mono', monospace; font-size: 13px; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--teal); margin-bottom: 28px;
+    position: relative; z-index: 1;
+  }
+  .hero-sub {
+    font-size: 18px; color: var(--text-sub); max-width: 580px;
+    line-height: 1.8; margin-bottom: 48px; position: relative; z-index: 1; font-weight: 400;
+  }
+  .hero-sub strong { color: var(--text); font-weight: 600; }
+  .hero-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-bottom: 72px; position: relative; z-index: 1; }
+  .btn-primary {
+    background: var(--purple); color: #ffffff; border: none; cursor: pointer;
+    padding: 15px 38px; font-size: 15px; font-weight: 600;
+    font-family: 'DM Sans', sans-serif; border-radius: 100px; transition: all 0.25s;
+  }
+  .btn-primary:hover { background: var(--purple-light); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(124,58,237,0.4); }
+  .btn-secondary {
+    background: rgba(196,181,253,0.08); color: #ffffff; cursor: pointer;
+    border: 2px solid rgba(196,181,253,0.25);
+    padding: 15px 38px; font-size: 15px; font-weight: 600;
+    font-family: 'DM Sans', sans-serif; border-radius: 100px; transition: all 0.25s;
+  }
+  .btn-secondary:hover { border-color: var(--lavender); color: var(--lavender); }
+  .hero-stats {
+    display: flex; gap: 48px; justify-content: center;
+    padding-top: 40px; border-top: 1px solid var(--border);
+    flex-wrap: wrap; position: relative; z-index: 1;
+  }
+  .stat-num {
+    font-family: 'DM Serif Display', serif; font-size: 40px;
+    background: linear-gradient(135deg, var(--lavender), var(--teal));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    line-height: 1; text-align: center;
+  }
+  .stat-label { font-size: 12px; color: var(--text-sub); margin-top: 5px; text-align: center; font-weight: 500; }
+
+  /* PERSONAL NOTE */
+  .personal-note { padding: 80px 60px; background: var(--dark); border-bottom: 1px solid var(--border); }
+  .note-inner {
+    max-width: 800px; margin: 0 auto;
+    background: var(--card); border: 1px solid rgba(196,181,253,0.15);
+    border-radius: 16px; padding: 56px 60px; position: relative;
+  }
+  .note-inner::before {
+    content: '"'; font-family: 'DM Serif Display', serif; font-size: 120px;
+    color: rgba(124,58,237,0.15); position: absolute; top: -20px; left: 32px; line-height: 1;
+  }
+  .note-label { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--teal); margin-bottom: 20px; }
+  .note-text {
+    font-family: 'DM Serif Display', serif; font-size: clamp(18px, 2.5vw, 26px);
+    font-style: italic; line-height: 1.6; color: #ffffff; margin-bottom: 28px;
+  }
+  .note-sub { font-size: 15px; color: var(--text-sub); line-height: 1.8; margin-bottom: 24px; }
+  .note-sub strong { color: var(--text); }
+  .note-tags { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 28px; }
+  .note-tag {
+    background: rgba(124,58,237,0.15); border: 1px solid rgba(196,181,253,0.25);
+    border-radius: 100px; padding: 5px 14px;
+    font-family: 'DM Mono', monospace; font-size: 11px; color: var(--lavender); letter-spacing: 0.05em;
+  }
+  .note-author { display: flex; align-items: center; gap: 14px; }
+  .note-avatar {
+    width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--purple), var(--teal));
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Serif Display', serif; font-size: 18px; color: #ffffff;
+  }
+  .note-name { font-size: 14px; font-weight: 600; color: var(--text); }
+  .note-title { font-size: 12px; color: var(--text-muted); margin-top: 2px; font-family: 'DM Mono', monospace; line-height: 1.6; }
+
+  /* SPEAKING UP */
+  .speaking-up { padding: 100px 60px; background: var(--bg); }
+  .speak-inner {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; margin-top: 60px;
+  }
+  .speak-text { }
+  .speak-quote {
+    font-family: 'DM Serif Display', serif; font-size: clamp(22px, 3vw, 32px);
+    font-style: italic; color: #ffffff; line-height: 1.5; margin-bottom: 24px;
+  }
+  .speak-quote em {
+    background: linear-gradient(135deg, var(--lavender), var(--teal));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-style: normal;
+  }
+  .speak-desc { font-size: 15px; color: var(--text-sub); line-height: 1.8; margin-bottom: 20px; }
+  .speak-desc strong { color: var(--text); }
+  .speak-barriers { display: flex; flex-direction: column; gap: 14px; }
+  .barrier-item {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 18px 20px;
+    display: flex; align-items: flex-start; gap: 14px;
+  }
+  .barrier-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+  .barrier-text { font-size: 14px; color: var(--text-sub); line-height: 1.7; }
+  .barrier-text strong { color: var(--text); display: block; margin-bottom: 4px; }
+
+  /* WHAT IS AUTISM */
+  .what-section { padding: 120px 60px; background: var(--dark); }
+  .section-label {
+    font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.3em;
+    text-transform: uppercase; color: var(--lavender); margin-bottom: 16px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .section-label::before { content: '🧩'; font-size: 14px; }
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(36px, 5vw, 58px); line-height: 1.1;
+    margin-bottom: 16px; color: #ffffff;
+  }
+  .section-title em {
+    font-style: italic;
+    background: linear-gradient(135deg, var(--lavender), var(--teal));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .section-sub { font-size: 16px; color: var(--text-sub); max-width: 520px; line-height: 1.8; margin-bottom: 60px; }
+  .what-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .what-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 40px 32px; transition: all 0.3s;
+  }
+  .what-card:hover { transform: translateY(-4px); border-color: rgba(196,181,253,0.3); }
+  .what-icon { font-size: 36px; margin-bottom: 20px; display: block; }
+  .what-title { font-family: 'DM Serif Display', serif; font-size: 22px; color: #ffffff; margin-bottom: 12px; }
+  .what-desc { font-size: 14px; line-height: 1.8; color: var(--text-sub); }
+
+  /* ASPERGER'S + ADHD */
+  .conditions { padding: 120px 60px; background: var(--bg); }
+  .conditions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 60px; }
+  .condition-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 44px 36px; transition: all 0.3s; position: relative; overflow: hidden;
+  }
+  .condition-card:hover { transform: translateY(-4px); border-color: rgba(196,181,253,0.3); }
+  .condition-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--purple), var(--teal));
+  }
+  .condition-badge {
+    display: inline-block; background: rgba(124,58,237,0.15); border: 1px solid rgba(196,181,253,0.25);
+    border-radius: 100px; padding: 4px 14px; margin-bottom: 20px;
+    font-family: 'DM Mono', monospace; font-size: 11px; color: var(--lavender); letter-spacing: 0.1em;
+  }
+  .condition-title { font-family: 'DM Serif Display', serif; font-size: 28px; color: #ffffff; margin-bottom: 16px; }
+  .condition-desc { font-size: 14px; color: var(--text-sub); line-height: 1.8; margin-bottom: 20px; }
+  .condition-desc strong { color: var(--text); }
+  .condition-note {
+    background: rgba(45,212,191,0.08); border: 1px solid rgba(45,212,191,0.2);
+    border-radius: 8px; padding: 14px 16px;
+    font-size: 13px; color: #a7f3d0; line-height: 1.7;
+  }
+  .condition-note strong { color: #ffffff; }
+
+  /* MENTAL HEALTH */
+  .mental-health { padding: 120px 60px; background: var(--dark); }
+  .mh-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 60px; }
+  .mh-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 40px 32px; transition: all 0.3s;
+  }
+  .mh-card:hover { transform: translateY(-3px); border-color: rgba(196,181,253,0.3); }
+  .mh-icon { font-size: 36px; margin-bottom: 18px; display: block; }
+  .mh-title { font-family: 'DM Serif Display', serif; font-size: 24px; color: #ffffff; margin-bottom: 12px; }
+  .mh-desc { font-size: 14px; color: var(--text-sub); line-height: 1.8; margin-bottom: 18px; }
+  .mh-desc strong { color: var(--text); }
+  .mh-tip {
+    background: rgba(124,58,237,0.1); border: 1px solid rgba(124,58,237,0.25);
+    border-radius: 8px; padding: 12px 16px;
+    font-size: 13px; color: var(--lavender); line-height: 1.6;
+  }
+  .mh-tip strong { color: #ffffff; }
+
+  /* UNIVERSITY */
+  .university { padding: 120px 60px; background: var(--bg); }
+  .uni-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start; margin-top: 60px; }
+  .uni-text { display: flex; flex-direction: column; gap: 20px; }
+  .uni-item {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 24px 24px 24px 20px;
+    display: grid; grid-template-columns: 4px 1fr; gap: 18px; transition: border-color 0.3s;
+  }
+  .uni-item:hover { border-color: rgba(196,181,253,0.3); }
+  .uni-accent { width: 4px; border-radius: 4px; background: linear-gradient(180deg, var(--purple), var(--teal)); min-height: 48px; }
+  .uni-item-title { font-size: 15px; font-weight: 600; color: #ffffff; margin-bottom: 6px; }
+  .uni-item-desc { font-size: 13px; color: var(--text-sub); line-height: 1.7; }
+  .uni-stats { display: flex; flex-direction: column; gap: 16px; }
+  .stat-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 28px; text-align: center; transition: all 0.3s;
+  }
+  .stat-card:hover { border-color: rgba(196,181,253,0.3); transform: translateY(-2px); }
+  .stat-big {
+    font-family: 'DM Serif Display', serif; font-size: 52px; line-height: 1;
+    background: linear-gradient(135deg, var(--lavender), var(--teal));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px;
+  }
+  .stat-desc { font-size: 14px; color: var(--text-sub); line-height: 1.6; }
+  .stat-desc strong { color: var(--text); }
+
+  /* EVERYDAY */
+  .everyday { padding: 120px 60px; background: var(--dark); }
+  .everyday-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 60px; }
+  .everyday-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 40px 32px; transition: all 0.3s; position: relative; overflow: hidden;
+  }
+  .everyday-card:hover { transform: translateY(-4px); border-color: rgba(196,181,253,0.3); }
+  .everyday-card::after {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--purple), var(--teal));
+    transform: scaleX(0); transition: transform 0.4s; transform-origin: left;
+  }
+  .everyday-card:hover::after { transform: scaleX(1); }
+  .everyday-icon { font-size: 36px; margin-bottom: 18px; display: block; }
+  .everyday-title { font-family: 'DM Serif Display', serif; font-size: 22px; color: #ffffff; margin-bottom: 12px; }
+  .everyday-desc { font-size: 14px; line-height: 1.8; color: var(--text-sub); margin-bottom: 18px; }
+  .everyday-tip {
+    background: rgba(124,58,237,0.1); border: 1px solid rgba(124,58,237,0.25);
+    border-radius: 8px; padding: 12px 16px;
+    font-size: 13px; color: var(--lavender); line-height: 1.6;
+  }
+  .everyday-tip strong { color: #ffffff; }
+
+  /* RESOURCES */
+  .resources { padding: 120px 60px; background: var(--bg); }
+  .resources-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 60px; }
+  .resource-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 32px 28px; transition: all 0.3s;
+  }
+  .resource-card:hover { transform: translateY(-4px); border-color: rgba(45,212,191,0.3); }
+  .resource-type { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--teal); margin-bottom: 12px; font-weight: 500; }
+  .resource-title { font-family: 'DM Serif Display', serif; font-size: 20px; color: #ffffff; margin-bottom: 10px; }
+  .resource-desc { font-size: 13px; color: var(--text-sub); line-height: 1.7; margin-bottom: 18px; }
+  .resource-link { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--lavender); text-decoration: none; transition: gap 0.2s; }
+  .resource-link:hover { gap: 10px; color: var(--teal); }
+
+  /* CTA */
+  .cta-section { padding: 120px 60px; text-align: center; background: var(--dark); border-top: 1px solid var(--border); }
+  .cta-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(40px, 6vw, 72px); line-height: 1.1;
+    margin-bottom: 20px; color: #ffffff;
+  }
+  .cta-title em {
+    font-style: italic;
+    background: linear-gradient(135deg, var(--lavender), var(--teal));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .cta-sub { font-size: 16px; color: var(--text-sub); max-width: 460px; margin: 0 auto 48px; line-height: 1.8; }
+  .cta-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .btn-cta-primary {
+    background: var(--purple); color: #ffffff; border: none; cursor: pointer;
+    padding: 16px 40px; font-size: 15px; font-weight: 600;
+    font-family: 'DM Sans', sans-serif; border-radius: 100px; transition: all 0.25s;
+  }
+  .btn-cta-primary:hover { background: var(--purple-light); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(124,58,237,0.4); }
+  .btn-cta-secondary {
+    background: rgba(196,181,253,0.08); color: #ffffff; cursor: pointer;
+    border: 2px solid rgba(196,181,253,0.25);
+    padding: 16px 40px; font-size: 15px; font-weight: 600;
+    font-family: 'DM Sans', sans-serif; border-radius: 100px; transition: all 0.25s;
+  }
+  .btn-cta-secondary:hover { border-color: var(--lavender); color: var(--lavender); }
+
+  footer {
+    padding: 44px 60px; background: var(--bg); border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .footer-logo { font-family: 'DM Serif Display', serif; font-size: 22px; background: linear-gradient(135deg, var(--lavender), var(--teal)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .footer-tagline { font-size: 12px; color: var(--text-muted); margin-top: 4px; font-family: 'DM Mono', monospace; }
+  .footer-links { display: flex; gap: 28px; }
+  .footer-links a { font-size: 13px; color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
+  .footer-links a:hover { color: var(--text); }
+  .footer-copy { font-size: 11px; color: rgba(138,122,153,0.4); font-family: 'DM Mono', monospace; }
+
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 900px) {
+    nav { padding: 16px 20px; }
+    .nav-links { display: none; }
+    .hero { padding: 100px 20px 60px; }
+    .hero-stats { gap: 24px; }
+    .personal-note { padding: 60px 20px; }
+    .note-inner { padding: 36px 24px; }
+    .speaking-up { padding: 80px 20px; }
+    .speak-inner { grid-template-columns: 1fr; gap: 40px; }
+    .what-section { padding: 80px 20px; }
+    .what-grid { grid-template-columns: 1fr; }
+    .conditions { padding: 80px 20px; }
+    .conditions-grid { grid-template-columns: 1fr; }
+    .mental-health { padding: 80px 20px; }
+    .mh-grid { grid-template-columns: 1fr; }
+    .university { padding: 80px 20px; }
+    .uni-grid { grid-template-columns: 1fr; gap: 40px; }
+    .everyday { padding: 80px 20px; }
+    .everyday-grid { grid-template-columns: 1fr; }
+    .resources { padding: 80px 20px; }
+    .resources-grid { grid-template-columns: 1fr; }
+    .cta-section { padding: 80px 20px; }
+    footer { flex-direction: column; gap: 20px; padding: 32px 20px; text-align: center; }
+    .footer-links { flex-wrap: wrap; justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">NEUVIA</div>
+  <div class="nav-links">
+    <a href="#what">What is Autism</a>
+    <a href="#university">University Life</a>
+    <a href="#mental">Mental Health</a>
+    <a href="#resources">Resources</a>
+  </div>
+  <button class="nav-cta">Get Support</button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-dots"></div>
+  <div class="hero-badge"><span></span> Autism Awareness & Support Platform</div>
+  <h1 class="hero-title">Every mind has<br>a <em>path.</em></h1>
+  <p class="hero-tagline">Understanding. Support. Community.</p>
+  <p class="hero-sub">
+    NEUVIA is a resource hub built for <strong>autistic individuals, families, and educators</strong> — from early childhood all the way through university and beyond. You are not alone in this.
+  </p>
+  <div class="hero-actions">
+    <button class="btn-primary">Find Resources →</button>
+    <button class="btn-secondary">Learn More</button>
+  </div>
+  <div class="hero-stats">
+    <div><div class="stat-num">1 in 36</div><div class="stat-label">Children diagnosed with autism</div></div>
+    <div><div class="stat-num">70%</div><div class="stat-label">Of autistic students struggle in university</div></div>
+    <div><div class="stat-num">50K+</div><div class="stat-label">Families supported through NEUVIA</div></div>
+  </div>
+</section>
+
+<!-- PERSONAL NOTE -->
+<section class="personal-note">
+  <div class="note-inner reveal">
+    <div class="note-label">A note from our founder</div>
+    <p class="note-text">"I built NEUVIA because I lived it. I am autistic. I have Asperger's and ADHD — and for a long time, I didn't even have the right words to explain what that meant."</p>
+    <p class="note-sub">The resources existed. The support was out there. But <strong>nobody told me about it</strong> — and even when I found out, speaking up about it felt impossible. That's the part nobody talks about. It's not just about having autism. It's about how hard it is to ask for help when your brain makes that feel overwhelming. <strong>NEUVIA exists to lower that barrier.</strong> So you don't have to figure it out alone the way I did.</p>
+    <div class="note-tags">
+      <span class="note-tag">Autistic</span>
+      <span class="note-tag">Asperger's</span>
+      <span class="note-tag">ADHD</span>
+      <span class="note-tag">Software Engineering Student @ ECU</span>
+    </div>
+    <div class="note-author">
+      <div class="note-avatar">AE</div>
+      <div>
+        <div class="note-name">Antonio Ervin</div>
+        <div class="note-title">Founder, NEUVIA · Built this because I needed it.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SPEAKING UP -->
+<section class="speaking-up" id="speak">
+  <div class="section-label">The barrier nobody talks about</div>
+  <h2 class="section-title">The hardest part isn't <em>the diagnosis.</em></h2>
+  <div class="speak-inner">
+    <div class="speak-text reveal">
+      <p class="speak-quote">The resources are out there. <em>But speaking up to access them is its own challenge.</em></p>
+      <p class="speak-desc">For many autistic people, asking for help — even when they desperately need it — is one of the hardest things to do. It's not laziness. It's not stubbornness. It's the way the autistic brain processes vulnerability, social risk, and communication.</p>
+      <p class="speak-desc"><strong>The support systems exist at universities. The accommodations are available. The mental health resources are there.</strong> But if speaking up feels impossible, none of that matters.</p>
+      <p class="speak-desc">NEUVIA exists to make that first step smaller — by giving you the information, the words, and the community to help you take it.</p>
+    </div>
+    <div class="speak-barriers reveal">
+      <div class="barrier-item">
+        <div class="barrier-icon">😶</div>
+        <div class="barrier-text">
+          <strong>Fear of judgment</strong>
+          Many autistic people worry they won't be believed, taken seriously, or that disclosing will change how others see them.
+        </div>
+      </div>
+      <div class="barrier-item">
+        <div class="barrier-icon">🔄</div>
+        <div class="barrier-text">
+          <strong>Years of masking</strong>
+          After years of hiding autistic traits to fit in, asking for help feels like admitting something they've been trained to conceal.
+        </div>
+      </div>
+      <div class="barrier-item">
+        <div class="barrier-icon">🗣️</div>
+        <div class="barrier-text">
+          <strong>Communication barriers</strong>
+          Explaining your needs out loud — especially to authority figures like professors or administrators — can be genuinely overwhelming.
+        </div>
+      </div>
+      <div class="barrier-item">
+        <div class="barrier-icon">❓</div>
+        <div class="barrier-text">
+          <strong>Not knowing what's available</strong>
+          A lot of autistic students simply don't know what accommodations or services they're entitled to. Nobody told them — and they didn't know to ask.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT IS AUTISM -->
+<section class="what-section" id="what">
+  <div class="section-label">The basics</div>
+  <h2 class="section-title">What is <em>autism?</em></h2>
+  <p class="section-sub">Autism is not a disease. It's not something to be fixed. It's a different way of experiencing the world — and understanding it changes everything.</p>
+  <div class="what-grid">
+    <div class="what-card reveal">
+      <span class="what-icon">🧠</span>
+      <div class="what-title">A Different Way of Thinking</div>
+      <p class="what-desc">Autism Spectrum Disorder (ASD) is a neurodevelopmental condition that affects how people perceive, communicate, and interact with the world. Every autistic person's experience is unique — that's why it's called a spectrum.</p>
+    </div>
+    <div class="what-card reveal">
+      <span class="what-icon">📊</span>
+      <div class="what-title">The Spectrum is Wide</div>
+      <p class="what-desc">Some autistic people are highly verbal and academically gifted. Others may be non-speaking or need more daily support. There is no single look of autism — and no two people share the exact same experience. Strengths and challenges vary widely.</p>
+    </div>
+    <div class="what-card reveal">
+      <span class="what-icon">💡</span>
+      <div class="what-title">Strengths, Not Just Challenges</div>
+      <p class="what-desc">Many autistic individuals have exceptional abilities in pattern recognition, deep focus, creativity, and systems thinking. The challenges are real — but so are the strengths. Both deserve to be understood and respected.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ASPERGER'S + ADHD -->
+<section class="conditions" id="conditions">
+  <div class="section-label">Conditions that often go together</div>
+  <h2 class="section-title">Asperger's, ADHD, <em>and you.</em></h2>
+  <p class="section-sub">Two conditions that are frequently misunderstood — and often appear together in the same person.</p>
+  <div class="conditions-grid">
+    <div class="condition-card reveal">
+      <div class="condition-badge">Asperger's Syndrome</div>
+      <div class="condition-title">What is Asperger's?</div>
+      <p class="condition-desc">Asperger's Syndrome was a diagnosis used to describe autistic people who were highly verbal and didn't have significant intellectual disabilities — but still experienced real challenges with social communication, sensory processing, and rigid thinking patterns.</p>
+      <p class="condition-desc">In 2013, Asperger's was officially folded into the broader <strong>Autism Spectrum Disorder (ASD)</strong> diagnosis by the DSM-5. So technically, it's no longer a separate diagnosis — but the experience is absolutely still real.</p>
+      <p class="condition-desc">Many people diagnosed with Asperger's before 2013 still identify with that term. <strong>Your identity and your experience are valid</strong> — regardless of what the diagnostic manual says.</p>
+      <div class="condition-note"><strong>Common traits:</strong> Strong focus on specific interests, difficulty with unspoken social rules, direct communication style, sensitivity to routines and changes, and often high intellectual ability in specific areas.</div>
+    </div>
+    <div class="condition-card reveal">
+      <div class="condition-badge">ADHD + Autism</div>
+      <div class="condition-title">When They Overlap</div>
+      <p class="condition-desc">ADHD and autism are two separate neurodevelopmental conditions — but they frequently co-occur in the same person. Research suggests that <strong>up to 50-70% of autistic people also have ADHD</strong>, and vice versa.</p>
+      <p class="condition-desc">When you have both, the experience can feel complex and sometimes contradictory — autism may make you want routine and predictability, while ADHD makes it hard to maintain one. Autism may make you hyperfocus, while ADHD makes you lose track of time. Both are real. Both are valid.</p>
+      <p class="condition-desc">Getting diagnosed with both — or only one — doesn't make your experience more or less legitimate. <strong>You know your brain better than any checklist.</strong></p>
+      <div class="condition-note"><strong>Common overlap experiences:</strong> Difficulty with executive function, emotional regulation challenges, sensory sensitivity, social exhaustion, hyperfocus on specific interests, and trouble with transitions.</div>
+    </div>
+  </div>
+</section>
+
+<!-- MENTAL HEALTH -->
+<section class="mental-health" id="mental">
+  <div class="section-label">Mental health</div>
+  <h2 class="section-title">Autism and <em>mental health.</em></h2>
+  <p class="section-sub">Being autistic in a world not built for you takes a toll. Mental health challenges are common — and they deserve to be taken seriously.</p>
+  <div class="mh-grid">
+    <div class="mh-card reveal">
+      <span class="mh-icon">😰</span>
+      <div class="mh-title">Anxiety</div>
+      <p class="mh-desc">Anxiety is one of the most common co-occurring conditions in autistic people. <strong>The unpredictability of social situations, sensory overload, and the constant effort of navigating a neurotypical world</strong> can create chronic anxiety that goes far beyond everyday stress.</p>
+      <div class="mh-tip"><strong>What helps:</strong> Reducing unpredictability, clear routines, therapy with an autism-informed provider, and giving yourself permission to avoid situations that consistently overwhelm you.</div>
+    </div>
+    <div class="mh-card reveal">
+      <span class="mh-icon">💭</span>
+      <div class="mh-title">Depression</div>
+      <p class="mh-desc">Feeling like you don't fit in, years of masking, social isolation, and the exhaustion of constantly adapting — <strong>these experiences put autistic people at significantly higher risk for depression</strong>. It's not weakness. It's what happens when you've been running on empty for too long.</p>
+      <div class="mh-tip"><strong>What helps:</strong> Finding autistic community, reducing masking, working with a therapist who understands autism, and being honest with yourself about what's too much.</div>
+    </div>
+    <div class="mh-card reveal">
+      <span class="mh-icon">🎭</span>
+      <div class="mh-title">Masking & Burnout</div>
+      <p class="mh-desc">Masking means hiding your autistic traits to fit in — suppressing stimming, forcing eye contact, performing neurotypical social scripts. <strong>Over time, masking leads to autistic burnout</strong> — a complete shutdown of mental, emotional, and physical energy that can last weeks or months.</p>
+      <div class="mh-tip"><strong>What helps:</strong> Letting yourself unmask in safe spaces, building recovery time into your schedule, and surrounding yourself with people who accept you as you are.</div>
+    </div>
+    <div class="mh-card reveal">
+      <span class="mh-icon">🤝</span>
+      <div class="mh-title">You Are Not Broken</div>
+      <p class="mh-desc">Mental health struggles don't mean something is wrong with you. They mean you've been carrying a lot — probably without enough support. <strong>Getting help is not weakness. It's the smartest thing you can do</strong> for yourself and for the people who care about you.</p>
+      <div class="mh-tip"><strong>Where to start:</strong> Talk to your university's disability services, look for autism-affirming therapists, or reach out to NEUVIA's peer support community. You don't have to explain everything at once.</div>
+    </div>
+  </div>
+</section>
+
+<!-- UNIVERSITY -->
+<section class="university" id="university">
+  <div class="section-label">University life</div>
+  <h2 class="section-title">How autism affects<br><em>students in college.</em></h2>
+  <div class="uni-grid">
+    <div class="uni-text reveal">
+      <div class="uni-item">
+        <div class="uni-accent"></div>
+        <div>
+          <div class="uni-item-title">Sensory Overload on Campus</div>
+          <p class="uni-item-desc">Crowded dining halls, loud lecture halls, fluorescent lighting, and constant noise can be overwhelming. What feels normal to others can feel physically painful or mentally exhausting to autistic students.</p>
+        </div>
+      </div>
+      <div class="uni-item">
+        <div class="uni-accent"></div>
+        <div>
+          <div class="uni-item-title">Social Navigation is Hard</div>
+          <p class="uni-item-desc">Making friends, reading social cues, knowing when to speak in class — these things that seem automatic to neurotypical students can require enormous mental effort for autistic students every single day.</p>
+        </div>
+      </div>
+      <div class="uni-item">
+        <div class="uni-accent"></div>
+        <div>
+          <div class="uni-item-title">Executive Function Challenges</div>
+          <p class="uni-item-desc">Managing deadlines, organizing assignments, switching between tasks — these can be genuinely difficult. Not because of laziness, but because of how the autistic brain processes and prioritizes information.</p>
+        </div>
+      </div>
+      <div class="uni-item">
+        <div class="uni-accent"></div>
+        <div>
+          <div class="uni-item-title">Not Knowing Your Rights</div>
+          <p class="uni-item-desc">Many autistic students don't know what accommodations they're entitled to, or feel too overwhelmed to ask. Extended test time, quiet spaces, and flexible deadlines can make a massive difference — but only if you know they exist.</p>
+        </div>
+      </div>
+    </div>
+    <div class="uni-stats reveal">
+      <div class="stat-card">
+        <div class="stat-big">36%</div>
+        <p class="stat-desc"><strong>of autistic college students</strong> drop out within their first year — compared to 28% of neurotypical students. The right support changes this.</p>
+      </div>
+      <div class="stat-card">
+        <div class="stat-big">67%</div>
+        <p class="stat-desc"><strong>of autistic university students</strong> report feeling socially isolated on campus. Community and peer support dramatically changes outcomes.</p>
+      </div>
+      <div class="stat-card">
+        <div class="stat-big">85%</div>
+        <p class="stat-desc"><strong>of autistic adults</strong> are underemployed or unemployed despite having the skills. Awareness and early support close this gap.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EVERYDAY -->
+<section class="everyday">
+  <div class="section-label">Everyday life</div>
+  <h2 class="section-title">What it actually <em>feels like.</em></h2>
+  <p class="section-sub">Beyond the diagnosis — here's what daily life looks like for many autistic individuals, and practical ways to navigate it.</p>
+  <div class="everyday-grid">
+    <div class="everyday-card reveal">
+      <span class="everyday-icon">👂</span>
+      <div class="everyday-title">Sensory Sensitivity</div>
+      <p class="everyday-desc">Sounds, lights, textures, and smells that go unnoticed by others can be intensely uncomfortable — or even painful. This isn't being dramatic. It's a neurological reality that deserves to be respected.</p>
+      <div class="everyday-tip"><strong>What helps:</strong> Noise canceling headphones, choosing quieter environments, and communicating your sensory needs to people around you without shame.</div>
+    </div>
+    <div class="everyday-card reveal">
+      <span class="everyday-icon">🔄</span>
+      <div class="everyday-title">Routines & Predictability</div>
+      <p class="everyday-desc">Unexpected changes can cause significant distress. This isn't stubbornness — it's how the autistic brain seeks safety and stability in a world that often feels unpredictable and overwhelming.</p>
+      <div class="everyday-tip"><strong>What helps:</strong> Visual schedules, advance notice of changes, building flexible routines, and understanding that predictability is a valid form of self-care.</div>
+    </div>
+    <div class="everyday-card reveal">
+      <span class="everyday-icon">💬</span>
+      <div class="everyday-title">Communication Differences</div>
+      <p class="everyday-desc">Autistic people may communicate more directly, more literally, or better through writing than speech. This isn't rudeness. It's a different communication style — and it has real strengths.</p>
+      <div class="everyday-tip"><strong>What helps:</strong> Clear and direct communication, written instructions, patience with processing time, and recognizing that different doesn't mean wrong.</div>
+    </div>
+    <div class="everyday-card reveal">
+      <span class="everyday-icon">⚡</span>
+      <div class="everyday-title">Autistic Burnout</div>
+      <p class="everyday-desc">Masking — hiding autistic traits to fit in — is exhausting. Over time it leads to burnout: a complete mental, emotional, and physical shutdown. It's real, it's serious, and it can last weeks or months.</p>
+      <div class="everyday-tip"><strong>What helps:</strong> Reducing masking, building in recovery time, setting limits on social energy, and finding safe spaces where you can just be yourself.</div>
+    </div>
+  </div>
+</section>
+
+<!-- RESOURCES -->
+<section class="resources" id="resources">
+  <div class="section-label">Resources</div>
+  <h2 class="section-title">Find <em>support</em> that fits.</h2>
+  <p class="section-sub">Whether you're a student, a parent, or someone newly diagnosed — these resources are here to help you take the next step.</p>
+  <div class="resources-grid">
+    <div class="resource-card reveal">
+      <div class="resource-type">For Students</div>
+      <div class="resource-title">University Accommodation Guide</div>
+      <p class="resource-desc">A step-by-step guide to requesting academic accommodations — extended time, quiet testing, flexible deadlines, and more. Know your rights.</p>
+      <a href="#" class="resource-link">Read the guide →</a>
+    </div>
+    <div class="resource-card reveal">
+      <div class="resource-type">For Families</div>
+      <div class="resource-title">Early Diagnosis Resources</div>
+      <p class="resource-desc">From early intervention to IEP support — resources for families navigating an autism diagnosis from childhood through young adulthood.</p>
+      <a href="#" class="resource-link">Explore resources →</a>
+    </div>
+    <div class="resource-card reveal">
+      <div class="resource-type">For Everyone</div>
+      <div class="resource-title">Understanding Autism 101</div>
+      <p class="resource-desc">A plain-language guide written for anyone who wants to be a better friend, family member, educator, or colleague to an autistic person.</p>
+      <a href="#" class="resource-link">Start learning →</a>
+    </div>
+    <div class="resource-card reveal">
+      <div class="resource-type">Mental Health</div>
+      <div class="resource-title">Burnout Recovery Guide</div>
+      <p class="resource-desc">Recognize the signs of autistic burnout and learn practical strategies to recover, protect your energy, and reduce masking in daily life.</p>
+      <a href="#" class="resource-link">Learn more →</a>
+    </div>
+    <div class="resource-card reveal">
+      <div class="resource-type">Community</div>
+      <div class="resource-title">Find Your People</div>
+      <p class="resource-desc">Connect with autistic communities, peer support groups, and advocacy organizations that actually listen to and center autistic voices.</p>
+      <a href="#" class="resource-link">Find community →</a>
+    </div>
+    <div class="resource-card reveal">
+      <div class="resource-type">Asperger's & ADHD</div>
+      <div class="resource-title">Navigating Both</div>
+      <p class="resource-desc">Resources specifically for people navigating Asperger's, ADHD, or both — including guides on the 2013 reclassification and what it means for your identity.</p>
+      <a href="#" class="resource-link">Read more →</a>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2 class="cta-title">Your path is<br><em>valid.</em></h2>
+  <p class="cta-sub">No matter where you are in your journey — as an autistic person, a family member, or someone learning — NEUVIA is here for you. You don't have to figure this out alone.</p>
+  <div class="cta-actions">
+    <button class="btn-cta-primary">Find Your Resources →</button>
+    <button class="btn-cta-secondary">Share NEUVIA</button>
+  </div>
+</section>
+
+<footer>
+  <div>
+    <div class="footer-logo">NEUVIA</div>
+    <div class="footer-tagline">// every mind has a path.</div>
+  </div>
+  <div class="footer-links">
+    <a href="#">About</a>
+    <a href="#">Resources</a>
+    <a href="#">Community</a>
+    <a href="#">Contact</a>
+  </div>
+  <div class="footer-copy">© 2026 NEUVIA. Built with purpose.</div>
+</footer>
+
+<script>
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) setTimeout(() => entry.target.classList.add('visible'), i * 80);
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

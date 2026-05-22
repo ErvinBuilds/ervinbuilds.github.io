@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Robot Navigation — ErvinBuilds</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #12121a;
+    --dark: #0e0e16;
+    --card: #1a1a26;
+    --silver: #e8e8f0;
+    --silver-bright: #ffffff;
+    --silver-dim: #b0b0c0;
+    --silver-soft: rgba(232,232,240,0.08);
+    --silver-border: rgba(232,232,240,0.15);
+    --text: #f0f0f8;
+    --text-sub: #b0b0c8;
+    --text-muted: #505060;
+    --green: #22c55e;
+    --red: #ef4444;
+    --border: rgba(232,232,240,0.1);
+  }
+  html { height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh; overflow-x: hidden; }
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-thumb { background: var(--silver-border); border-radius: 2px; }
+
+  nav {
+    padding: 16px 48px; display: flex; justify-content: space-between; align-items: center;
+    background: var(--dark); border-bottom: 1px solid var(--border);
+  }
+  .nav-left { display: flex; align-items: center; gap: 12px; }
+  .nav-icon { width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg, #404050, #909098); display: flex; align-items: center; justify-content: center; font-size: 18px; box-shadow: 0 0 20px rgba(232,232,240,0.15); }
+  .nav-title { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; color: var(--text); }
+  .nav-sub { font-size: 11px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; margin-top: 1px; }
+  .nav-logo { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 800; background: linear-gradient(135deg, #FFD700, #FFA500); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+  .hero { padding: 36px 48px 24px; border-bottom: 1px solid var(--border); }
+  .hero-eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--silver-dim); margin-bottom: 10px; }
+  .hero h1 { font-family: 'Syne', sans-serif; font-size: clamp(28px, 4vw, 48px); font-weight: 800; color: var(--text); line-height: 1.05; margin-bottom: 10px; }
+  .hero h1 span { background: linear-gradient(135deg, var(--silver), var(--silver-bright)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 20px rgba(232,232,240,0.3)); }
+  .hero p { font-size: 14px; color: var(--text-sub); max-width: 580px; line-height: 1.7; margin-bottom: 14px; }
+  .algo-badge { display: inline-flex; align-items: center; gap: 8px; background: var(--silver-soft); border: 1px solid var(--silver-border); border-radius: 6px; padding: 6px 14px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--silver-dim); letter-spacing: 0.08em; }
+
+  .app { display: grid; grid-template-columns: 250px 1fr; min-height: calc(100vh - 220px); }
+
+  .sidebar { background: var(--dark); border-right: 1px solid var(--border); padding: 22px 16px; display: flex; flex-direction: column; gap: 22px; overflow-y: auto; }
+  .s-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
+
+  .mode-btn { width: 100%; padding: 10px 14px; border-radius: 7px; cursor: pointer; font-size: 12px; font-weight: 500; color: var(--text-sub); background: transparent; border: 1px solid rgba(255,255,255,0.05); font-family: 'Inter', sans-serif; transition: all 0.15s; text-align: left; display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
+  .mode-btn:hover { background: var(--silver-soft); border-color: var(--silver-border); color: var(--text); }
+  .mode-btn.active { background: var(--silver-soft); border-color: var(--silver-border); color: var(--silver); }
+  .mode-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+
+  .ctrl-group { display: flex; flex-direction: column; gap: 8px; }
+  .ctrl-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-sub); font-weight: 500; }
+  .ctrl-row span { font-family: 'JetBrains Mono', monospace; color: var(--silver); font-weight: 700; }
+  input[type="range"] { width: 100%; -webkit-appearance: none; height: 4px; background: rgba(232,232,240,0.1); border-radius: 2px; outline: none; cursor: pointer; }
+  input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--silver); cursor: pointer; box-shadow: 0 0 8px rgba(232,232,240,0.4); }
+
+  .btn-run { width: 100%; padding: 12px; background: linear-gradient(135deg, #404050, #909098); color: #fff; border: none; border-radius: 7px; font-size: 13px; font-weight: 700; font-family: 'Inter', sans-serif; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 18px rgba(232,232,240,0.1); margin-bottom: 6px; }
+  .btn-run:hover { background: linear-gradient(135deg, #606070, #b0b0b8); transform: translateY(-2px); box-shadow: 0 6px 24px rgba(232,232,240,0.2); }
+  .btn-run:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+  .btn-ghost { width: 100%; padding: 9px; background: transparent; color: var(--text-sub); border: 1px solid rgba(255,255,255,0.07); border-radius: 7px; font-size: 12px; font-weight: 600; font-family: 'Inter', sans-serif; cursor: pointer; transition: all 0.2s; margin-bottom: 5px; }
+  .btn-ghost:hover { border-color: var(--silver-border); color: var(--silver); }
+
+  .stat-list { display: flex; flex-direction: column; gap: 8px; }
+  .stat-item { display: flex; justify-content: space-between; }
+  .stat-key { font-size: 11px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+  .stat-val { font-size: 12px; font-weight: 700; color: var(--silver); font-family: 'JetBrains Mono', monospace; }
+
+  .legend-list { display: flex; flex-direction: column; gap: 7px; }
+  .legend-item { display: flex; align-items: center; gap: 9px; font-size: 11px; color: var(--text-sub); }
+  .legend-box { width: 13px; height: 13px; border-radius: 3px; flex-shrink: 0; }
+
+  .grid-area { padding: 24px 32px; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+
+  .status-bar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; width: 100%; max-width: 680px; }
+  .stat-chip { background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 7px 14px; display: flex; align-items: center; gap: 8px; }
+  .stat-chip-label { font-size: 10px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 0.1em; }
+  .stat-chip-val { font-size: 14px; font-weight: 700; color: var(--silver); font-family: 'JetBrains Mono', monospace; }
+  .status-pill { margin-left: auto; padding: 6px 14px; border-radius: 100px; font-size: 10px; font-weight: 700; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.1em; text-transform: uppercase; }
+  .status-pill.idle { background: rgba(255,255,255,0.04); color: var(--text-muted); }
+  .status-pill.running { background: rgba(232,232,240,0.1); color: var(--silver); animation: blink 1s infinite; }
+  .status-pill.moving { background: rgba(34,197,94,0.1); color: var(--green); animation: blink 0.6s infinite; }
+  .status-pill.done { background: rgba(34,197,94,0.1); color: var(--green); }
+  .status-pill.blocked { background: rgba(239,68,68,0.1); color: var(--red); }
+  @keyframes blink { 0%,100%{opacity:1}50%{opacity:0.5} }
+
+  #grid-canvas { border: 1px solid var(--silver-border); border-radius: 8px; box-shadow: 0 0 40px rgba(232,232,240,0.04); cursor: crosshair; display: block; max-width: 100%; }
+  .grid-hint { font-size: 11px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; text-align: center; }
+
+  @media (max-width: 900px) {
+    nav { padding: 14px 20px; }
+    .hero { padding: 24px 20px 16px; }
+    .app { grid-template-columns: 1fr; }
+    .sidebar { border-right: none; border-bottom: 1px solid var(--border); }
+    .grid-area { padding: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-left">
+    <div class="nav-icon">🤖</div>
+    <div>
+      <div class="nav-title">Robot Navigation Sim</div>
+      <div class="nav-sub">// ai.pathfinding · ErvinBuilds</div>
+    </div>
+  </div>
+  <div class="nav-logo">ErvinBuilds</div>
+</nav>
+
+<div class="hero">
+  <div class="hero-eyebrow">// robotics.simulation</div>
+  <h1>Watch AI <span>navigate</span> in real time.</h1>
+  <p>Place obstacles, set a destination, and watch the robot find the optimal path using the A* pathfinding algorithm — the same logic used in GPS navigation and game AI.</p>
+  <div class="algo-badge">🤖 Algorithm: A* Pathfinding — f(n) = g(n) + h(n)</div>
+</div>
+
+<div class="app">
+  <aside class="sidebar">
+    <div>
+      <div class="s-label">Draw Mode</div>
+      <button class="mode-btn active" id="mode-wall" onclick="setMode('wall')"><div class="mode-dot" style="background:#2a2a3a;border:1px solid #505060"></div>Draw Walls</button>
+      <button class="mode-btn" id="mode-start" onclick="setMode('start')"><div class="mode-dot" style="background:#22c55e;box-shadow:0 0 5px #22c55e66"></div>Set Start</button>
+      <button class="mode-btn" id="mode-end" onclick="setMode('end')"><div class="mode-dot" style="background:#ef4444;box-shadow:0 0 5px #ef444466"></div>Set Target</button>
+      <button class="mode-btn" id="mode-erase" onclick="setMode('erase')"><div class="mode-dot" style="border:1px dashed #505060"></div>Erase</button>
+    </div>
+    <div class="ctrl-group">
+      <div class="s-label">Animation Speed</div>
+      <div class="ctrl-row">Speed <span id="speed-label">Medium</span></div>
+      <input type="range" id="speed-slider" min="1" max="5" value="3" oninput="updateSpeed(this.value)">
+    </div>
+    <div class="ctrl-group">
+      <div class="s-label">Grid Size</div>
+      <div class="ctrl-row">Size <span id="size-label">20×20</span></div>
+      <input type="range" id="size-slider" min="10" max="35" value="20" oninput="updateGridSize(this.value)">
+    </div>
+    <div>
+      <button class="btn-run" id="btn-run" onclick="runPathfinding()">▶ Find Path</button>
+      <button class="btn-ghost" onclick="generateMaze()">⚡ Generate Maze</button>
+      <button class="btn-ghost" onclick="clearPath()">↺ Clear Path</button>
+      <button class="btn-ghost" onclick="clearAll()">✕ Reset All</button>
+    </div>
+    <div>
+      <div class="s-label">Live Stats</div>
+      <div class="stat-list">
+        <div class="stat-item"><span class="stat-key">nodes_explored</span><span class="stat-val" id="stat-explored">0</span></div>
+        <div class="stat-item"><span class="stat-key">path_length</span><span class="stat-val" id="stat-path">—</span></div>
+        <div class="stat-item"><span class="stat-key">walls_placed</span><span class="stat-val" id="stat-walls">0</span></div>
+        <div class="stat-item"><span class="stat-key">grid_size</span><span class="stat-val" id="stat-grid">20×20</span></div>
+      </div>
+    </div>
+    <div>
+      <div class="s-label">Legend</div>
+      <div class="legend-list">
+        <div class="legend-item"><div class="legend-box" style="background:#22c55e;box-shadow:0 0 5px #22c55e44"></div>Start Position</div>
+        <div class="legend-item"><div class="legend-box" style="background:#ef4444;box-shadow:0 0 5px #ef444444"></div>Target</div>
+        <div class="legend-item"><div class="legend-box" style="background:#2a2a3a;border:1px solid #505060"></div>Wall / Obstacle</div>
+        <div class="legend-item"><div class="legend-box" style="background:rgba(232,232,240,0.2);border:1px solid rgba(232,232,240,0.3)"></div>Explored</div>
+        <div class="legend-item"><div class="legend-box" style="background:#e8e8f0;box-shadow:0 0 6px rgba(232,232,240,0.5)"></div>Optimal Path</div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="grid-area">
+    <div class="status-bar">
+      <div class="stat-chip"><span class="stat-chip-label">Explored</span><span class="stat-chip-val" id="chip-explored">0</span></div>
+      <div class="stat-chip"><span class="stat-chip-label">Path</span><span class="stat-chip-val" id="chip-path">—</span></div>
+      <div class="stat-chip"><span class="stat-chip-label">Walls</span><span class="stat-chip-val" id="chip-walls">0</span></div>
+      <div class="status-pill idle" id="status-pill">STANDBY</div>
+    </div>
+    <canvas id="grid-canvas"></canvas>
+    <div class="grid-hint">// click or drag to place walls · select mode from sidebar · hit Find Path to run A*</div>
+  </main>
+</div>
+
+<script>
+const canvas = document.getElementById('grid-canvas');
+const ctx = canvas.getContext('2d');
+let COLS=20,ROWS=20,CELL=32;
+let grid=[],startCell=null,endCell=null;
+let currentMode='wall',isMouseDown=false,running=false,speedLevel=3;
+const SPEEDS={1:80,2:35,3:12,4:4,5:1};
+const SPEED_LABELS={1:'Slowest',2:'Slow',3:'Medium',4:'Fast',5:'Fastest'};
+const EMPTY=0,WALL=1,START=2,END=3,VISITED=4,PATH=5,EXPLORING=6;
+
+function initGrid(){
+  grid=Array.from({length:ROWS},()=>Array(COLS).fill(EMPTY));
+  startCell={r:Math.floor(ROWS/2),c:2};
+  endCell={r:Math.floor(ROWS/2),c:COLS-3};
+  grid[startCell.r][startCell.c]=START;
+  grid[endCell.r][endCell.c]=END;
+}
+
+function resizeCanvas(){
+  const area=document.querySelector('.grid-area');
+  const maxW=area.offsetWidth-64;
+  const maxH=window.innerHeight-360;
+  CELL=Math.min(Math.floor(maxW/COLS),Math.floor(maxH/ROWS));
+  if(CELL<14)CELL=14;
+  canvas.width=COLS*CELL;
+  canvas.height=ROWS*CELL;
+  draw();
+}
+
+function draw(robotPos){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle='#12121a';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  for(let r=0;r<ROWS;r++){
+    for(let c=0;c<COLS;c++){
+      const s=grid[r][c];
+      const x=c*CELL,y=r*CELL;
+      ctx.save();
+
+      // grid line
+      ctx.strokeStyle='rgba(232,232,240,0.05)';
+      ctx.lineWidth=0.5;
+      ctx.strokeRect(x,y,CELL,CELL);
+
+      if(s===WALL){
+        ctx.fillStyle='#252535';
+        ctx.fillRect(x+1,y+1,CELL-2,CELL-2);
+        ctx.strokeStyle='rgba(232,232,240,0.08)';
+        ctx.lineWidth=0.5;
+        ctx.strokeRect(x+1,y+1,CELL-2,CELL-2);
+      } else if(s===START){
+        ctx.shadowColor='#22c55e';ctx.shadowBlur=16;
+        ctx.fillStyle='rgba(34,197,94,0.18)';
+        ctx.fillRect(x+1,y+1,CELL-2,CELL-2);
+        ctx.shadowBlur=0;
+        ctx.font=Math.floor(CELL*0.62)+'px serif';
+        ctx.textAlign='center';ctx.textBaseline='middle';
+        ctx.fillText('🤖',x+CELL/2,y+CELL/2);
+      } else if(s===END){
+        ctx.shadowColor='#ef4444';ctx.shadowBlur=16;
+        ctx.fillStyle='rgba(239,68,68,0.18)';
+        ctx.fillRect(x+1,y+1,CELL-2,CELL-2);
+        ctx.shadowBlur=0;
+        ctx.font=Math.floor(CELL*0.56)+'px serif';
+        ctx.textAlign='center';ctx.textBaseline='middle';
+        ctx.fillText('🎯',x+CELL/2,y+CELL/2);
+      } else if(s===VISITED){
+        ctx.fillStyle='rgba(232,232,240,0.13)';
+        ctx.fillRect(x+2,y+2,CELL-4,CELL-4);
+      } else if(s===EXPLORING){
+        ctx.fillStyle='rgba(232,232,240,0.32)';
+        ctx.fillRect(x+2,y+2,CELL-4,CELL-4);
+      } else if(s===PATH){
+        ctx.shadowColor='rgba(255,255,255,0.7)';ctx.shadowBlur=10;
+        ctx.fillStyle='#e8e8f0';
+        const p=Math.floor(CELL*0.28);
+        ctx.fillRect(x+p,y+p,CELL-p*2,CELL-p*2);
+      }
+      ctx.restore();
+    }
+  }
+
+  if(robotPos){
+    const x=robotPos.c*CELL,y=robotPos.r*CELL;
+    ctx.save();
+    ctx.shadowColor='#ffffff';ctx.shadowBlur=22;
+    ctx.font=Math.floor(CELL*0.72)+'px serif';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText('🤖',x+CELL/2,y+CELL/2);
+    ctx.restore();
+  }
+  updateStats();
+}
+
+function updateStats(){
+  let walls=0,visited=0,path=0;
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){
+    if(grid[r][c]===WALL)walls++;
+    if(grid[r][c]===VISITED||grid[r][c]===EXPLORING)visited++;
+    if(grid[r][c]===PATH)path++;
+  }
+  document.getElementById('stat-walls').textContent=walls;
+  document.getElementById('chip-walls').textContent=walls;
+  document.getElementById('stat-explored').textContent=visited+path;
+  document.getElementById('chip-explored').textContent=visited+path;
+  document.getElementById('stat-path').textContent=path>0?path:'—';
+  document.getElementById('chip-path').textContent=path>0?path:'—';
+}
+
+function getCellFromEvent(e){
+  const rect=canvas.getBoundingClientRect();
+  const sx=canvas.width/rect.width,sy=canvas.height/rect.height;
+  return{r:Math.floor((e.clientY-rect.top)*sy/CELL),c:Math.floor((e.clientX-rect.left)*sx/CELL)};
+}
+
+function handleCell(e){
+  if(running)return;
+  const{r,c}=getCellFromEvent(e);
+  if(r<0||r>=ROWS||c<0||c>=COLS)return;
+  if(currentMode==='wall'&&grid[r][c]!==START&&grid[r][c]!==END)grid[r][c]=WALL;
+  else if(currentMode==='erase'&&grid[r][c]!==START&&grid[r][c]!==END)grid[r][c]=EMPTY;
+  else if(currentMode==='start'){if(startCell)grid[startCell.r][startCell.c]=EMPTY;startCell={r,c};if(endCell&&endCell.r===r&&endCell.c===c)endCell=null;grid[r][c]=START;}
+  else if(currentMode==='end'){if(endCell)grid[endCell.r][endCell.c]=EMPTY;endCell={r,c};if(startCell&&startCell.r===r&&startCell.c===c)startCell=null;grid[r][c]=END;}
+  draw();
+}
+
+canvas.addEventListener('mousedown',e=>{isMouseDown=true;handleCell(e);});
+canvas.addEventListener('mousemove',e=>{if(isMouseDown)handleCell(e);});
+canvas.addEventListener('mouseup',()=>isMouseDown=false);
+canvas.addEventListener('mouseleave',()=>isMouseDown=false);
+canvas.addEventListener('touchstart',e=>{e.preventDefault();isMouseDown=true;handleCell(e.touches[0]);},{passive:false});
+canvas.addEventListener('touchmove',e=>{e.preventDefault();if(isMouseDown)handleCell(e.touches[0]);},{passive:false});
+canvas.addEventListener('touchend',()=>isMouseDown=false);
+
+function heuristic(a,b){return Math.abs(a.r-b.r)+Math.abs(a.c-b.c);}
+function getNeighbors(n){return[{r:n.r-1,c:n.c},{r:n.r+1,c:n.c},{r:n.r,c:n.c-1},{r:n.r,c:n.c+1}].filter(nb=>nb.r>=0&&nb.r<ROWS&&nb.c>=0&&nb.c<COLS&&grid[nb.r][nb.c]!==WALL);}
+
+async function runPathfinding(){
+  if(running||!startCell||!endCell){if(!startCell||!endCell)setStatus('blocked');return;}
+  clearPath();running=true;
+  document.getElementById('btn-run').disabled=true;
+  setStatus('running');
+  const key=n=>`${n.r},${n.c}`,startKey=key(startCell),endKey=key(endCell);
+  const openSet=[{...startCell,f:heuristic(startCell,endCell)}];
+  const cameFrom={},gScore={[startKey]:0};
+  let found=false,steps=0;
+  while(openSet.length>0){
+    openSet.sort((a,b)=>a.f-b.f);
+    const cur=openSet.shift(),ck=key(cur);
+    if(ck===endKey){found=true;break;}
+    for(const nb of getNeighbors(cur)){
+      const nk=key(nb),tg=(gScore[ck]||0)+1;
+      if(tg<(gScore[nk]??Infinity)){
+        cameFrom[nk]=cur;gScore[nk]=tg;
+        const f=tg+heuristic(nb,endCell);
+        if(!openSet.find(n=>key(n)===nk))openSet.push({...nb,f});
+        if(grid[nb.r][nb.c]!==START&&grid[nb.r][nb.c]!==END)grid[nb.r][nb.c]=EXPLORING;
+      }
+    }
+    if(grid[cur.r][cur.c]!==START&&grid[cur.r][cur.c]!==END)grid[cur.r][cur.c]=VISITED;
+    steps++;
+    if(steps%Math.max(1,Math.floor(4/speedLevel))===0){draw();await new Promise(r=>setTimeout(r,SPEEDS[speedLevel]));}
+    if(!running){document.getElementById('btn-run').disabled=false;return;}
+  }
+  draw();
+  if(found){
+    let cur=endCell;const pathNodes=[];
+    while(key(cur)!==startKey){pathNodes.unshift(cur);cur=cameFrom[key(cur)];}
+    for(const p of pathNodes)if(grid[p.r][p.c]!==END)grid[p.r][p.c]=PATH;
+    draw();
+    await new Promise(r=>setTimeout(r,250));
+    if(!running){document.getElementById('btn-run').disabled=false;return;}
+    setStatus('moving');
+    grid[startCell.r][startCell.c]=PATH;
+    for(const p of pathNodes){
+      if(!running){document.getElementById('btn-run').disabled=false;return;}
+      draw(p);
+      await new Promise(r=>setTimeout(r,SPEEDS[speedLevel]*3));
+    }
+    const ex=endCell.c*CELL,ey=endCell.r*CELL;
+    ctx.save();ctx.font=Math.floor(CELL*0.72)+'px serif';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.shadowColor='#22c55e';ctx.shadowBlur=20;
+    ctx.fillText('🎉',ex+CELL/2,ey+CELL/2);ctx.restore();
+    setStatus('done');
+  } else { setStatus('blocked'); }
+  running=false;document.getElementById('btn-run').disabled=false;
+}
+
+function setStatus(s){
+  const pill=document.getElementById('status-pill');
+  const labels={idle:'STANDBY',running:'SEARCHING...',moving:'ROBOT MOVING 🤖',done:'TARGET REACHED 🎉',blocked:'NO PATH FOUND ✗'};
+  pill.className='status-pill '+s;pill.textContent=labels[s]||s;
+}
+
+function setMode(m){
+  currentMode=m;
+  ['wall','start','end','erase'].forEach(x=>document.getElementById('mode-'+x).classList.toggle('active',x===m));
+}
+
+function clearPath(){
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++)
+    if([VISITED,PATH,EXPLORING].includes(grid[r][c]))grid[r][c]=EMPTY;
+  if(startCell)grid[startCell.r][startCell.c]=START;
+  running=false;document.getElementById('btn-run').disabled=false;
+  setStatus('idle');draw();
+}
+
+function clearAll(){
+  running=false;initGrid();
+  document.getElementById('btn-run').disabled=false;
+  setStatus('idle');resizeCanvas();
+}
+
+function generateMaze(){
+  if(running)return;clearPath();
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++)
+    if(grid[r][c]!==START&&grid[r][c]!==END)
+      grid[r][c]=Math.random()<0.28?WALL:EMPTY;
+  draw();
+}
+
+function updateSpeed(v){speedLevel=parseInt(v);document.getElementById('speed-label').textContent=SPEED_LABELS[v];}
+function updateGridSize(v){
+  if(running)return;COLS=ROWS=parseInt(v);
+  document.getElementById('size-label').textContent=`${v}×${v}`;
+  document.getElementById('stat-grid').textContent=`${v}×${v}`;
+  initGrid();resizeCanvas();
+}
+
+window.addEventListener('resize',resizeCanvas);
+initGrid();resizeCanvas();
+</script>
+</body>
+</html>
